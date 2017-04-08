@@ -1,6 +1,12 @@
 package fi.istrange.traveler;
 
+import fi.istrange.traveler.auth.AuthorizedUser;
+import fi.istrange.traveler.auth.UserAuthenticator;
+import fi.istrange.traveler.resources.PersonalCardResource;
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
+import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -11,9 +17,7 @@ import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 
-import javax.inject.Inject;
 /**
  * Created by aleksandr on 26.3.2017.
  */
@@ -30,7 +34,16 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
-        // TODO: add Jersey resources here
+        environment.jersey().register(new AuthDynamicFeature(
+                new OAuthCredentialAuthFilter.Builder<AuthorizedUser>()
+                        .setAuthenticator(new UserAuthenticator())
+                        .setPrefix("Bearer")
+                        .buildAuthFilter()));
+
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUser.class));
+
+        // TODO pass PersonalCardDAO as param
+        environment.jersey().register(new PersonalCardResource());
     }
 
     @Override
