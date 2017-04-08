@@ -5,6 +5,7 @@ import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.PersonalCardUpdateReq;
 import fi.istrange.traveler.auth.AuthorizedUser;
 import io.dropwizard.auth.Auth;
+import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @Path("/personal-cards")
 @Produces(MediaType.APPLICATION_JSON)
+@Api(value = "/personal-cards", tags = "personal cards")
 @PermitAll
 public class PersonalCardResource {
 
@@ -25,7 +27,7 @@ public class PersonalCardResource {
     }
 
     @GET
-    public List<PersonalCardRes> getTravelCards(@Auth AuthorizedUser authorizedUser) {
+    public List<PersonalCardRes> getTravelCards(@ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
         // TODO access DAO here and get list of personal cards
         return new ArrayList<>();
     }
@@ -33,7 +35,7 @@ public class PersonalCardResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public PersonalCardRes createTravelCard(
-            @Auth AuthorizedUser authorizedUser,
+            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             PersonalCardCreationReq personalCardCreationReq) {
         // TODO put new card in the db
         return new PersonalCardRes();
@@ -42,7 +44,7 @@ public class PersonalCardResource {
     @GET
     @Path("/{id}")
     public PersonalCardRes getTravelCard(
-            @Auth AuthorizedUser authorizedUser,
+            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId) {
         // TODO get card from the db
         return new PersonalCardRes();
@@ -52,7 +54,7 @@ public class PersonalCardResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public PersonalCardRes updateTravelCard(
-            @Auth AuthorizedUser authorizedUser,
+            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId,
             PersonalCardUpdateReq personalCardUpdateReq) {
         // TODO update card in the db
@@ -62,7 +64,7 @@ public class PersonalCardResource {
     @DELETE
     @Path("/{id}")
     public PersonalCardRes deactivateTravelCard(
-            @Auth AuthorizedUser authorizedUser,
+            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId) {
         // TODO deactivate card record
         return new PersonalCardRes();

@@ -13,7 +13,7 @@ public class UserAuthenticator implements Authenticator<String, AuthorizedUser> 
     @Override
     public Optional<AuthorizedUser> authenticate(String accessTokenId) throws AuthenticationException {
 
-        //TODO Token DAO to validate the token and update token's last access time goes here
+        //TODO Token DAO to validate the token and update token's last access time goes here, resolve user id and construct AuthorizedUser
         return Optional.of(new AuthorizedUser());
     }
 }
