@@ -21,6 +21,7 @@ server:
 
 swagger:
   resourcePackage: fi.istrange.traveler.resources
+  title: travel.er API
 
 database:
   driverClass: org.postgresql.Driver
