@@ -1,53 +1,49 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.PersonalCardCreationReq;
-import fi.istrange.traveler.api.PersonalCardRes;
-import fi.istrange.traveler.api.PersonalCardUpdateReq;
+import fi.istrange.traveler.api.*;
 import fi.istrange.traveler.auth.AuthorizedUser;
 import io.dropwizard.auth.Auth;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by arsenii on 4/7/17.
  */
-@Path("/personal-cards")
+@Path("/group-cards")
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "/personal-cards", tags = "personal cards")
+@Api(value = "/group-cards", tags = "group cards")
 @PermitAll
-public class PersonalCardResource {
+public class GroupCardResource {
 
     // TODO DAO will go here as parameter
-    public PersonalCardResource() {
+    public GroupCardResource() {
     }
 
     @GET
-    @ApiOperation(value = "Produces list of personal travel cards", authorizations = @Authorization(
-            value = "auth_scheme", scopes = @AuthorizationScope(
-            scope = "user", description = "Write access to user data")))
-    public List<PersonalCardRes> getPersonalCards(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
-        // TODO access DAO here and get list of personal cards
+    public List<GroupCardRes> getGroupCards(@ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
+        // TODO access DAO here and get list of group cards
         throw new NotImplementedException();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public PersonalCardRes createPersonalCard(
+    public GroupCardRes createGroupCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            PersonalCardCreationReq personalCardCreationReq) {
+            GroupCardCreationReq groupCardCreationReq) {
         // TODO put new card in the db
         throw new NotImplementedException();
     }
 
     @GET
     @Path("/{id}")
-    public PersonalCardRes getPersonalCard(
+    public GroupCardRes getGroupCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId) {
         // TODO get card from the db
@@ -57,17 +53,17 @@ public class PersonalCardResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public PersonalCardRes updatePersonalCard(
+    public GroupCardRes updateGroupCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId,
-            PersonalCardUpdateReq personalCardUpdateReq) {
+            GroupCardUpdateReq groupCardUpdateReq) {
         // TODO update card in the db
         throw new NotImplementedException();
     }
 
     @DELETE
     @Path("/{id}")
-    public PersonalCardRes deactivatePersonalCard(
+    public GroupCardRes deactivateGroupCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId) {
         // TODO deactivate card record

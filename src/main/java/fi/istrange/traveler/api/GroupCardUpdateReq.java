@@ -7,21 +7,13 @@ import java.util.Date;
 /**
  * Created by arsenii on 4/8/17.
  */
-
-
-public class PersonalCardRes {
+public class GroupCardUpdateReq {
 
     //TODO just placeholder, populate later or replace with smth better
 
-    private long id = 25;
     private Date arrivalDateTime;
 
-    public PersonalCardRes() {}
-
-    @JsonProperty
-    public long getId() {
-        return id;
-    }
+    public GroupCardUpdateReq() {}
 
     @JsonProperty
     public Date getArrivalDateTime() {

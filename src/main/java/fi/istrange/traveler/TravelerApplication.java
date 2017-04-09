@@ -2,7 +2,10 @@ package fi.istrange.traveler;
 
 import fi.istrange.traveler.auth.AuthorizedUser;
 import fi.istrange.traveler.auth.UserAuthenticator;
+import fi.istrange.traveler.resources.TokenResource;
+import fi.istrange.traveler.resources.GroupCardResource;
 import fi.istrange.traveler.resources.PersonalCardResource;
+import fi.istrange.traveler.resources.UserResource;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
@@ -42,8 +45,11 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
 
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUser.class));
 
-        // TODO pass PersonalCardDAO as param
+        // TODO pass DAOs to resources
         environment.jersey().register(new PersonalCardResource());
+        environment.jersey().register(new GroupCardResource());
+        environment.jersey().register(new UserResource());
+        environment.jersey().register(new TokenResource());
     }
 
     @Override

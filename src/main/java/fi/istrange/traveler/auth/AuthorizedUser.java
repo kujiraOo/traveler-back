@@ -6,7 +6,7 @@ import java.security.Principal;
  * Created by arsenii on 4/8/17.
  */
 
-//TODO We can try to use domain class instead, but implementing Principal interface is dropwizard's requirement
+//TODO We can try to use domain class instead, but implementing Principal interface is dropwizard's requirement for auth provider
 public class AuthorizedUser implements Principal{
 
     @Override
