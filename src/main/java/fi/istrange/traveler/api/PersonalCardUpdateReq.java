@@ -1,5 +1,6 @@
 package fi.istrange.traveler.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
@@ -12,7 +13,12 @@ public class PersonalCardUpdateReq {
     //TODO just placeholder, populate later or replace with smth better
     private Date arrivalDateTime;
 
-    public PersonalCardUpdateReq() {}
+    @JsonCreator
+    public PersonalCardUpdateReq(
+            @JsonProperty("arrivalDateTime") Date arrivalDateTime
+    ) {
+        this.arrivalDateTime = arrivalDateTime;
+    }
 
     @JsonProperty
     public Date getArrivalDateTime() {

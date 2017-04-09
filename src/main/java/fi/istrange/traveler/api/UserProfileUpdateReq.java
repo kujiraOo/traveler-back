@@ -1,5 +1,6 @@
 package fi.istrange.traveler.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -14,24 +15,35 @@ public class UserProfileUpdateReq {
     private String email;
     private String password;
 
-    public UserProfileUpdateReq() {}
+    @JsonCreator
+    public UserProfileUpdateReq(
+            @JsonProperty("password") String password,
+            @JsonProperty("email") String email,
+            @JsonProperty("firstName") String firstName,
+            @JsonProperty("lastName") String lastName
+    ) {
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
-    @JsonProperty
+    @JsonProperty("firstName")
     public String getFirstName() {
         return firstName;
     }
 
-    @JsonProperty
+    @JsonProperty("lastName")
     public String getLastName() {
         return lastName;
     }
 
-    @JsonProperty
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
 
-    @JsonProperty
+    @JsonProperty("password")
     public String getPassword() {
         return password;
     }
