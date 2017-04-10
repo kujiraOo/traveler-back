@@ -83,8 +83,8 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         });
 
 
-        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) -> ((TravelerConfiguration) configuration).getJwtCookieAuth()));
-//        bootstrap.addBundle(JwtCookieAuthBundle.getDefault());
+//        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) -> ((TravelerConfiguration) configuration).getJwtCookieAuth()));
+        bootstrap.addBundle(JwtCookieAuthBundle.getDefault());
 
 
         // remove the commets when the actual DB can be instantiated
