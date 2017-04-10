@@ -19,6 +19,7 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookieAuthBundle;
 import org.glassfish.hk2.api.ServiceLocator;
 
 /**
@@ -37,18 +38,18 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
-        environment.jersey().register(new AuthDynamicFeature(
-                new OAuthCredentialAuthFilter.Builder<AuthorizedUser>()
-                        .setAuthenticator(new UserAuthenticator())
-                        .setPrefix("Bearer")
-                        .buildAuthFilter()));
-
-        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUser.class));
+//        environment.jersey().register(new AuthDynamicFeature(
+//                new OAuthCredentialAuthFilter.Builder<AuthorizedUser>()
+//                        .setAuthenticator(new UserAuthenticator())
+//                        .setPrefix("Bearer")
+//                        .buildAuthFilter()));
+//
+//        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUser.class));
 
         // TODO pass DAOs to resources
         environment.jersey().register(new PersonalCardResource());
-        environment.jersey().register(new GroupCardResource());
-        environment.jersey().register(new UserResource());
+//        environment.jersey().register(new GroupCardResource());
+//        environment.jersey().register(new UserResource());
         environment.jersey().register(new TokenResource());
     }
 
@@ -79,6 +80,10 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
                 return portalConfiguration.getSwaggerBundleConfiguration();
             }
         });
+
+        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier());
+
+
         // remove the commets when the actual DB can be instantiated
         // bootstrap.addBundle(applicationBundle.getJooqBundle());
     }
