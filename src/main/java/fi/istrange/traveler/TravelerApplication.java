@@ -7,6 +7,7 @@ import fi.istrange.traveler.resources.GroupCardResource;
 import fi.istrange.traveler.resources.PersonalCardResource;
 import fi.istrange.traveler.resources.UserResource;
 import io.dropwizard.Application;
+import io.dropwizard.Configuration;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
@@ -81,7 +82,9 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
             }
         });
 
-        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier());
+
+        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) -> ((TravelerConfiguration) configuration).getJwtCookieAuth()));
+//        bootstrap.addBundle(JwtCookieAuthBundle.getDefault());
 
 
         // remove the commets when the actual DB can be instantiated
