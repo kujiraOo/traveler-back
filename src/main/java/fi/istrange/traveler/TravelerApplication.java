@@ -1,16 +1,9 @@
 package fi.istrange.traveler;
 
-import fi.istrange.traveler.auth.AuthorizedUser;
-import fi.istrange.traveler.auth.UserAuthenticator;
-import fi.istrange.traveler.resources.TokenResource;
-import fi.istrange.traveler.resources.GroupCardResource;
+import fi.istrange.traveler.resources.AuthResource;
 import fi.istrange.traveler.resources.PersonalCardResource;
-import fi.istrange.traveler.resources.UserResource;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
-import io.dropwizard.auth.AuthDynamicFeature;
-import io.dropwizard.auth.AuthValueFactoryProvider;
-import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -39,19 +32,11 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
-//        environment.jersey().register(new AuthDynamicFeature(
-//                new OAuthCredentialAuthFilter.Builder<AuthorizedUser>()
-//                        .setAuthenticator(new UserAuthenticator())
-//                        .setPrefix("Bearer")
-//                        .buildAuthFilter()));
-//
-//        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUser.class));
-
         // TODO pass DAOs to resources
         environment.jersey().register(new PersonalCardResource());
 //        environment.jersey().register(new GroupCardResource());
 //        environment.jersey().register(new UserResource());
-        environment.jersey().register(new TokenResource());
+        environment.jersey().register(new AuthResource());
     }
 
     @Override
@@ -83,8 +68,8 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         });
 
 
-//        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) -> ((TravelerConfiguration) configuration).getJwtCookieAuth()));
-        bootstrap.addBundle(JwtCookieAuthBundle.getDefault());
+        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) ->
+                ((TravelerConfiguration) configuration).getJwtCookieAuth()));
 
 
         // remove the commets when the actual DB can be instantiated

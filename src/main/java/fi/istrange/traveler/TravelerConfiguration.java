@@ -34,7 +34,6 @@ public class TravelerConfiguration extends Configuration {
     @NotNull
     private JwtCookieAuthConfiguration jwtCookieAuth = new JwtCookieAuthConfiguration();
 
-    @JsonProperty("jwtCookieAuth")
     public JwtCookieAuthConfiguration getJwtCookieAuth() {
         return jwtCookieAuth;
     }
