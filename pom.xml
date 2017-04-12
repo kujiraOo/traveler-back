@@ -21,7 +21,7 @@
                     <plugin>
                         <groupId>org.jooq</groupId>
                         <artifactId>jooq-codegen-maven</artifactId>
-                        <version>3.8.4</version>
+                        <version>3.9.1</version>
 
                         <executions>
                             <execution>
@@ -34,9 +34,9 @@
                         <configuration>
                             <jdbc>
                                 <driver>org.postgresql.Driver</driver>
-                                <url>jdbc:postgresql://localhost:5432/traveler_test</url>
-                                <user>test</user>
-                                <password>test</password>
+                                <url>jdbc:postgresql://localhost:5432/traveler</url>
+                                <user>postgres</user>
+                                <password></password>
                             </jdbc>
                             <generator>
                                 <name>org.jooq.util.DefaultGenerator</name>
@@ -45,13 +45,8 @@
                                 </generate>
                                 <database>
                                     <name>org.jooq.util.postgres.PostgresDatabase</name>
-                                    <includes>
-                                        USER|USER_ROLE
-                                    </includes>
-                                    <excludes>
-                                        DATABASECHANGELOG
-                                        | DATABASECHANGELOGLOCK
-                                    </excludes>
+                                    <includes>.*</includes>
+                                    <excludes></excludes>
                                     <inputSchema>public</inputSchema>
                                 </database>
                                 <target>

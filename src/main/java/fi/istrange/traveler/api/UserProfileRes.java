@@ -2,30 +2,45 @@ package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 
+import java.util.Date;
 /**
  * Created by arsenii on 4/9/17.
  */
 public class UserProfileRes {
-
-    // TODO a placeholder to populate with appropriate values later
-
     private String username;
     private String firstName;
     private String lastName;
     private String email;
+    private Date birthday;
+    private String phone;
+    private String address;
+    private String city;
+    private String country;
+
 
     @JsonCreator
     public UserProfileRes(
             @JsonProperty("password") String username,
             @JsonProperty("email") String email,
             @JsonProperty("firstName") String firstName,
-            @JsonProperty("lastName") String lastName
+            @JsonProperty("lastName") String lastName,
+            Date birthday,
+            String phone,
+            String address,
+            String city,
+            String country
     ) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.birthday = birthday;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.country = country;
     }
 
     @JsonProperty
@@ -41,5 +56,49 @@ public class UserProfileRes {
     @JsonProperty
     public String getEmail() {
         return email;
+    }
+
+    @JsonProperty
+    public String getUsername() {
+        return username;
+    }
+
+    @JsonProperty
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    @JsonProperty
+    public String getPhone() {
+        return phone;
+    }
+
+    @JsonProperty
+    public String getAddress() {
+        return address;
+    }
+
+    @JsonProperty
+    public String getCity() {
+        return city;
+    }
+
+    @JsonProperty
+    public String getCountry() {
+        return country;
+    }
+
+    public static UserProfileRes fromEntity (TravelerUser traveler) {
+        return new UserProfileRes(
+                traveler.getUsername(),
+                traveler.getEmail(),
+                traveler.getFirstName(),
+                traveler.getLastName(),
+                traveler.getBirth(),
+                traveler.getPhone(),
+                traveler.getAddress(),
+                traveler.getCity(),
+                traveler.getCountry()
+        );
     }
 }

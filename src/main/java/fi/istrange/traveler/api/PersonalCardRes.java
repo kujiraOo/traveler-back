@@ -11,8 +11,6 @@ import java.util.Date;
 
 public class PersonalCardRes {
 
-    //TODO just placeholder, populate later or replace with smth better
-
     private long id = 25;
     private Date arrivalDateTime;
 
