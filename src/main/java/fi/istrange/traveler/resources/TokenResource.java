@@ -1,6 +1,7 @@
 package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserAuthReq;
+import fi.istrange.traveler.bundle.ApplicationBundle;
 import io.swagger.annotations.Api;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -18,9 +19,13 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 @Api(value = "/tokens", tags = "tokens")
 public class TokenResource {
+    // private final tokenDAO;
 
-    // TODO token DAO goes here as parameter
-    public TokenResource() {}
+    public TokenResource(
+            ApplicationBundle applicationBundle
+    ) {
+        // tokenDAO = new TokenDAO(applicationBundle.getJooqBundle().getConfiguration());
+    }
 
     @POST
     public String authorizeUser(UserAuthReq userAuthReq) {
