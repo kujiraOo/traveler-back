@@ -3,12 +3,12 @@ package fi.istrange.traveler.resources;
 import fi.istrange.traveler.api.CardCreationReq;
 import fi.istrange.traveler.api.CardRes;
 import fi.istrange.traveler.api.CardUpdateReq;
-import fi.istrange.traveler.auth.AuthorizedUser;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.pojos.PersonalCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
+import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
@@ -38,8 +38,9 @@ public class PersonalCardResource {
             value = "auth_scheme", scopes = @AuthorizationScope(
             scope = "user", description = "Write access to user data")))
     public List<CardRes> getPersonalCards(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
-        return this.cardDAO.fetchByUsernameFk(authorizedUser.getName())
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+    ) {
+        return this.cardDAO.fetchByUsernameFk(principal.getName())
                 .stream().map(CardRes::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -48,9 +49,10 @@ public class PersonalCardResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Create new personal card")
     public CardRes createPersonalCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            CardCreationReq personalCardCreationReq) {
-        this.cardDAO.insert(fromCreateReq(personalCardCreationReq, authorizedUser.getName()));
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            CardCreationReq personalCardCreationReq
+    ) {
+        this.cardDAO.insert(fromCreateReq(personalCardCreationReq, principal.getName()));
 
         return CardRes.fromEntity(this.cardDAO.fetchOneById(personalCardCreationReq.getId().intValue()));
     }
@@ -59,9 +61,10 @@ public class PersonalCardResource {
     @Path("/{id}")
     @ApiOperation("Get a personal card by id")
     public Optional<CardRes> getPersonalCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            @PathParam("id") long personalCardId) {
-        return this.cardDAO.fetchByUsernameFk(authorizedUser.getName())
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long personalCardId
+    ) {
+        return this.cardDAO.fetchByUsernameFk(principal.getName())
                 .stream()
                 .filter(p -> p.getId() == personalCardId)
                 .map(CardRes::fromEntity)
@@ -73,9 +76,10 @@ public class PersonalCardResource {
     @Path("/{id}")
     @ApiOperation("Update a personal card")
     public CardRes updatePersonalCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId,
-            CardUpdateReq cardUpdateReq) {
+            CardUpdateReq cardUpdateReq
+    ) {
         this.cardDAO.update(
                 fromUpdateReq(
                         cardUpdateReq,
@@ -90,8 +94,9 @@ public class PersonalCardResource {
     @Path("/{id}")
     @ApiOperation("Delete personal card")
     public CardRes deactivatePersonalCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            @PathParam("id") long personalCardId) {
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long personalCardId
+    ) {
         CardRes res = CardRes.fromEntity(cardDAO.fetchOneById((int)personalCardId));
         this.cardDAO.deleteById((int) personalCardId);
 

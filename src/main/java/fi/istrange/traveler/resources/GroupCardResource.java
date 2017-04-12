@@ -3,12 +3,12 @@ package fi.istrange.traveler.resources;
 import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.api.GroupCardUpdateReq;
-import fi.istrange.traveler.auth.AuthorizedUser;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
@@ -33,7 +33,9 @@ public class GroupCardResource {
     }
 
     @GET
-    public List<GroupCardRes> getGroupCards(@ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
+    public List<GroupCardRes> getGroupCards(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+    ) {
         // TODO access DAO here and get list of group cards
         throw new NotImplementedException();
     }
@@ -41,8 +43,9 @@ public class GroupCardResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public GroupCardRes createGroupCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            GroupCardCreationReq groupCardCreationReq) {
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            GroupCardCreationReq groupCardCreationReq
+    ) {
         // TODO put new card in the db
         throw new NotImplementedException();
     }
@@ -50,8 +53,9 @@ public class GroupCardResource {
     @GET
     @Path("/{id}")
     public GroupCardRes getGroupCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            @PathParam("id") long personalCardId) {
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long personalCardId
+    ) {
         // TODO get card from the db
         throw new NotImplementedException();
     }
@@ -60,9 +64,10 @@ public class GroupCardResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public GroupCardRes updateGroupCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId,
-            GroupCardUpdateReq groupCardUpdateReq) {
+            GroupCardUpdateReq groupCardUpdateReq
+    ) {
         // TODO update card in the db
         throw new NotImplementedException();
     }
@@ -70,8 +75,9 @@ public class GroupCardResource {
     @DELETE
     @Path("/{id}")
     public GroupCardRes deactivateGroupCard(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            @PathParam("id") long personalCardId) {
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long personalCardId
+    ) {
         // TODO deactivate card record
         throw new NotImplementedException();
     }

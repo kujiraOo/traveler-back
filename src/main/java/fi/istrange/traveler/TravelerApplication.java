@@ -34,7 +34,7 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
-        // TODO pass DAOs to resources
+        environment.jersey().register(new AuthResource());
         environment.jersey().register(new PersonalCardResource(applicationBundle));
         environment.jersey().register(new GroupCardResource(applicationBundle));
         environment.jersey().register(new UserResource(applicationBundle));

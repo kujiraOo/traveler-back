@@ -2,7 +2,6 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserProfileRes;
 import fi.istrange.traveler.api.UserProfileUpdateReq;
-import fi.istrange.traveler.auth.AuthorizedUser;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
@@ -10,6 +9,7 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
@@ -48,9 +48,9 @@ public class UserResource {
     @Path("/profile")
     @ApiOperation("Get user profile information")
     public UserProfileRes getUserProfile(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
     ) {
-        return UserProfileRes.fromEntity(this.userDAO.fetchOneByUsername(authorizedUser.getName()));
+        return UserProfileRes.fromEntity(this.userDAO.fetchOneByUsername(principal.getName()));
     }
 
     @PUT
@@ -59,23 +59,26 @@ public class UserResource {
     @Path("/profile")
     @ApiOperation("Update user profile information")
     public UserProfileRes updateUserProfile(
-            @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            UserProfileUpdateReq userProfileUpdateReq) {
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            UserProfileUpdateReq userProfileUpdateReq
+    ) {
         this.userDAO.update(
                 fromUpdateReq(
                         userProfileUpdateReq,
-                        this.userDAO.fetchOneByUsername(authorizedUser.getName())
+                        this.userDAO.fetchOneByUsername(principal.getName())
                 )
         );
 
-        return getUserProfile(authorizedUser);
+        return getUserProfile(principal);
     }
 
     @DELETE
     @PermitAll
     @Path("/profile")
     @ApiOperation("Deactivate user")
-    public UserProfileRes deactivateUser(@ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
+    public UserProfileRes deactivateUser(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+    ) {
         // TODO use user DAO to deactivate user's profile
         throw new NotImplementedException();
     }
