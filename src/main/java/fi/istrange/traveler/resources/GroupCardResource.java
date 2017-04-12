@@ -1,7 +1,11 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.*;
+import fi.istrange.traveler.api.GroupCardCreationReq;
+import fi.istrange.traveler.api.GroupCardRes;
+import fi.istrange.traveler.api.GroupCardUpdateReq;
 import fi.istrange.traveler.auth.AuthorizedUser;
+import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -10,7 +14,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +24,12 @@ import java.util.List;
 @Api(value = "/group-cards", tags = "group cards")
 @PermitAll
 public class GroupCardResource {
+    GroupCardDao cardDAO;
 
-    // TODO DAO will go here as parameter
-    public GroupCardResource() {
+    public GroupCardResource(
+            ApplicationBundle applicationBundle
+    ) {
+        this.cardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET

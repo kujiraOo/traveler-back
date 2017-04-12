@@ -1,28 +1,25 @@
 package fi.istrange.traveler.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Date;
+import java.sql.Date;
 
 /**
  * Created by arsenii on 4/8/17.
  */
-public class GroupCardRes {
+public class GroupCardRes extends CardRes {
 
-    //TODO just placeholder, populate later or replace with smth better
+    private Integer id;
+    private Date startTime;
+    private Date endTime;
+    private Long lon;
+    private Long lat;
 
-    private long id;
-    private Date arrivalDateTime;
-
-    public GroupCardRes() {}
-
-    @JsonProperty
-    public Date getArrivalDateTime() {
-        return arrivalDateTime;
-    }
-
-    @JsonProperty
-    public long getId() {
-        return id;
+    public GroupCardRes(
+        Integer id,
+        Date startTime,
+        Date endTime,
+        Long lon,
+        Long lat
+    ) {
+        super(id, startTime, endTime, lon, lat);
     }
 }

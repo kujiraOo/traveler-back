@@ -46,10 +46,10 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUser.class));
 
         // TODO pass DAOs to resources
-        environment.jersey().register(new PersonalCardResource());
-        environment.jersey().register(new GroupCardResource());
-        environment.jersey().register(new UserResource());
-        environment.jersey().register(new TokenResource());
+        environment.jersey().register(new PersonalCardResource(applicationBundle));
+        environment.jersey().register(new GroupCardResource(applicationBundle));
+        environment.jersey().register(new UserResource(applicationBundle));
+        environment.jersey().register(new TokenResource(applicationBundle));
     }
 
     @Override

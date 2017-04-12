@@ -7,7 +7,7 @@ server:
       - type: http
         port: 8080
       - type: https
-        port: 8443
+        port: 5000
         keyStorePath: example.keystore
         keyStorePassword: example
 
@@ -15,7 +15,7 @@ server:
     - type: http
       port: 8081
     - type: https
-      port: 8444
+      port: 5001
       keyStorePath: example.keystore
       keyStorePassword: example
 

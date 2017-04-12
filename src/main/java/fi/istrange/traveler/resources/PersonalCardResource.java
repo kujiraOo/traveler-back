@@ -1,17 +1,21 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.PersonalCardCreationReq;
-import fi.istrange.traveler.api.PersonalCardRes;
-import fi.istrange.traveler.api.PersonalCardUpdateReq;
+import fi.istrange.traveler.api.CardCreationReq;
+import fi.istrange.traveler.api.CardRes;
+import fi.istrange.traveler.api.CardUpdateReq;
 import fi.istrange.traveler.auth.AuthorizedUser;
+import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
+import fi.istrange.traveler.db.tables.pojos.PersonalCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by arsenii on 4/7/17.
@@ -21,56 +25,96 @@ import java.util.List;
 @Api(value = "/personal-cards", tags = "personal cards")
 @PermitAll
 public class PersonalCardResource {
+    PersonalCardDao cardDAO;
 
-    // TODO DAO will go here as parameter
-    public PersonalCardResource() {
+    public PersonalCardResource(
+            ApplicationBundle applicationBundle
+    ) {
+        this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET
     @ApiOperation(value = "Produces list of personal travel cards", authorizations = @Authorization(
             value = "auth_scheme", scopes = @AuthorizationScope(
             scope = "user", description = "Write access to user data")))
-    public List<PersonalCardRes> getPersonalCards(
+    public List<CardRes> getPersonalCards(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser) {
-        // TODO access DAO here and get list of personal cards
-        throw new NotImplementedException();
+        return this.cardDAO.fetchByUsernameFk(authorizedUser.getName())
+                .stream().map(CardRes::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public PersonalCardRes createPersonalCard(
+    @ApiOperation("Create new personal card")
+    public CardRes createPersonalCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
-            PersonalCardCreationReq personalCardCreationReq) {
-        // TODO put new card in the db
-        throw new NotImplementedException();
+            CardCreationReq personalCardCreationReq) {
+        this.cardDAO.insert(fromCreateReq(personalCardCreationReq, authorizedUser.getName()));
+
+        return CardRes.fromEntity(this.cardDAO.fetchOneById(personalCardCreationReq.getId().intValue()));
     }
 
     @GET
     @Path("/{id}")
-    public PersonalCardRes getPersonalCard(
+    @ApiOperation("Get a personal card by id")
+    public Optional<CardRes> getPersonalCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId) {
-        // TODO get card from the db
-        throw new NotImplementedException();
+        return this.cardDAO.fetchByUsernameFk(authorizedUser.getName())
+                .stream()
+                .filter(p -> p.getId() == personalCardId)
+                .map(CardRes::fromEntity)
+                .findFirst();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public PersonalCardRes updatePersonalCard(
+    @ApiOperation("Update a personal card")
+    public CardRes updatePersonalCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId,
-            PersonalCardUpdateReq personalCardUpdateReq) {
-        // TODO update card in the db
-        throw new NotImplementedException();
+            CardUpdateReq cardUpdateReq) {
+        this.cardDAO.update(
+                fromUpdateReq(
+                        cardUpdateReq,
+                        cardDAO.fetchOneById((int)personalCardId)
+                )
+        );
+
+        return CardRes.fromEntity(this.cardDAO.fetchOneById((int) personalCardId));
     }
 
     @DELETE
     @Path("/{id}")
-    public PersonalCardRes deactivatePersonalCard(
+    @ApiOperation("Delete personal card")
+    public CardRes deactivatePersonalCard(
             @ApiParam(hidden = true) @Auth AuthorizedUser authorizedUser,
             @PathParam("id") long personalCardId) {
-        // TODO deactivate card record
-        throw new NotImplementedException();
+        CardRes res = CardRes.fromEntity(cardDAO.fetchOneById((int)personalCardId));
+        this.cardDAO.deleteById((int) personalCardId);
+
+        return res;
+    }
+
+    private static PersonalCard fromCreateReq(CardCreationReq req, String username) {
+        return new PersonalCard(
+                req.getId().intValue(),
+                req.getStartTime(),
+                req.getEndTime(),
+                req.getLon(),
+                req.getLat(),
+                username
+        );
+    }
+
+    private static PersonalCard fromUpdateReq(CardUpdateReq req, PersonalCard card) {
+        card.setStartTime(req.getStartTime());
+        card.setEndTime(req.getEndTime());
+        card.setLon(req.getLon());
+        card.setLat(req.getLat());
+
+       return card;
     }
 }
