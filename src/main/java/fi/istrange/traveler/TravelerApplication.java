@@ -1,9 +1,6 @@
 package fi.istrange.traveler;
 
-import fi.istrange.traveler.resources.AuthResource;
-import fi.istrange.traveler.resources.GroupCardResource;
-import fi.istrange.traveler.resources.PersonalCardResource;
-import fi.istrange.traveler.resources.UserResource;
+import fi.istrange.traveler.resources.*;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
@@ -34,10 +31,11 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
-        environment.jersey().register(new AuthResource());
+        environment.jersey().register(new AuthResource(applicationBundle));
         environment.jersey().register(new PersonalCardResource(applicationBundle));
         environment.jersey().register(new GroupCardResource(applicationBundle));
         environment.jersey().register(new UserResource(applicationBundle));
+        environment.jersey().register(new ProfileResource(applicationBundle));
     }
 
     @Override
@@ -74,6 +72,6 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
 
 
         // remove the commets when the actual DB can be instantiated
-        // bootstrap.addBundle(applicationBundle.getJooqBundle());
+//        bootstrap.addBundle(applicationBundle.getJooqBundle());
     }
 }

@@ -1,5 +1,6 @@
 package fi.istrange.traveler.resources;
 
+import fi.istrange.traveler.api.CardRes;
 import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.api.GroupCardUpdateReq;
@@ -7,11 +8,13 @@ import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -33,10 +36,14 @@ public class GroupCardResource {
     }
 
     @GET
-    public List<GroupCardRes> getGroupCards(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+    @ApiOperation(value = "Produces list of group travel cards aggregated by radius")
+    public List<CardRes> getGroupCards(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @NotNull @QueryParam("lat") double lat,
+            @NotNull @QueryParam("lng") double lng
     ) {
-        // TODO access DAO here and get list of group cards
+        // TODO get cards in radius of N kilometers for specified lon and lat
+
         throw new NotImplementedException();
     }
 

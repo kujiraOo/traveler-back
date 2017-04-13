@@ -1,12 +1,11 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.UserAuthReq;
 import fi.istrange.traveler.api.UserCredentials;
+import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookiePrincipal;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -22,8 +21,10 @@ import javax.ws.rs.core.MediaType;
 @Api(value = "/auth", tags = "auth")
 public class AuthResource {
 
-    // TODO User DAO goes here as parameter
-    public AuthResource() {
+    private final TravelerUserDao travelerUserDao;
+
+    public AuthResource(ApplicationBundle applicationBundle) {
+        travelerUserDao = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @POST

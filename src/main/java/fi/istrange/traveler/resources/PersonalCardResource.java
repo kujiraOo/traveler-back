@@ -11,6 +11,7 @@ import io.swagger.annotations.*;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -34,12 +35,14 @@ public class PersonalCardResource {
     }
 
     @GET
-    @ApiOperation(value = "Produces list of personal travel cards", authorizations = @Authorization(
-            value = "auth_scheme", scopes = @AuthorizationScope(
-            scope = "user", description = "Write access to user data")))
+    @ApiOperation(value = "Produces list of personal travel cards aggregated by radius")
     public List<CardRes> getPersonalCards(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @NotNull @QueryParam("lat") double lat,
+            @NotNull @QueryParam("lng") double lng
     ) {
+        // TODO get cards in radius of N kilometers for specified lon and lat
+
         return this.cardDAO.fetchByUsernameFk(principal.getName())
                 .stream().map(CardRes::fromEntity)
                 .collect(Collectors.toList());
