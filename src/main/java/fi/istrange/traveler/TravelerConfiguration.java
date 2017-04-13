@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.db.DataSourceFactory;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import io.dropwizard.Configuration;
+import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookieAuthConfiguration;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.Valid;
@@ -28,6 +29,14 @@ public class TravelerConfiguration extends Configuration {
     }
 
     public void setDefaultName(String defaultName) { this.defaultName = defaultName; }
+
+    @Valid
+    @NotNull
+    private JwtCookieAuthConfiguration jwtCookieAuth = new JwtCookieAuthConfiguration();
+
+    public JwtCookieAuthConfiguration getJwtCookieAuth() {
+        return jwtCookieAuth;
+    }
 
     @JsonProperty("database")
     public DataSourceFactory getDataSourceFactory() {

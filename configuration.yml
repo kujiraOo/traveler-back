@@ -23,6 +23,13 @@ swagger:
   resourcePackage: fi.istrange.traveler.resources
   title: travel.er API
 
+jwtCookieAuth:
+  secretSeed: null
+  secure: false
+  httpOnly: true
+  sessionExpiryVolatile: PT30m
+  sessionExpiryPersistent: P7d
+
 database:
   driverClass: org.postgresql.Driver
   user: ${(env.DB_USER)!"test"}
