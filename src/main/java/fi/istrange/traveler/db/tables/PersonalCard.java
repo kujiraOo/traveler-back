@@ -11,6 +11,7 @@ import org.jooq.*;
 import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonalCard extends TableImpl<PersonalCardRecord> {
 
-    private static final long serialVersionUID = -1784966836;
+    private static final long serialVersionUID = -297646061;
 
     /**
      * The reference instance of <code>public.personal_card</code>
@@ -62,17 +63,22 @@ public class PersonalCard extends TableImpl<PersonalCardRecord> {
     /**
      * The column <code>public.personal_card.lon</code>.
      */
-    public final TableField<PersonalCardRecord, Long> LON = createField("lon", org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<PersonalCardRecord, BigDecimal> LON = createField("lon", org.jooq.impl.SQLDataType.NUMERIC.precision(10, 7), this, "");
 
     /**
      * The column <code>public.personal_card.lat</code>.
      */
-    public final TableField<PersonalCardRecord, Long> LAT = createField("lat", org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<PersonalCardRecord, BigDecimal> LAT = createField("lat", org.jooq.impl.SQLDataType.NUMERIC.precision(10, 7), this, "");
 
     /**
      * The column <code>public.personal_card.username_fk</code>.
      */
     public final TableField<PersonalCardRecord, String> USERNAME_FK = createField("username_fk", org.jooq.impl.SQLDataType.VARCHAR.length(80).nullable(false), this, "");
+
+    /**
+     * The column <code>public.personal_card.active</code>.
+     */
+    public final TableField<PersonalCardRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
      * Create a <code>public.personal_card</code> table reference

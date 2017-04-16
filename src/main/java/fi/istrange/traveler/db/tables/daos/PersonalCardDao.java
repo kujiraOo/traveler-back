@@ -7,6 +7,7 @@ package fi.istrange.traveler.db.tables.daos;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.records.PersonalCardRecord;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -82,14 +83,14 @@ public class PersonalCardDao extends DAOImpl<PersonalCardRecord, fi.istrange.tra
     /**
      * Fetch records that have <code>lon IN (values)</code>
      */
-    public List<fi.istrange.traveler.db.tables.pojos.PersonalCard> fetchByLon(Long... values) {
+    public List<fi.istrange.traveler.db.tables.pojos.PersonalCard> fetchByLon(BigDecimal... values) {
         return fetch(PersonalCard.PERSONAL_CARD.LON, values);
     }
 
     /**
      * Fetch records that have <code>lat IN (values)</code>
      */
-    public List<fi.istrange.traveler.db.tables.pojos.PersonalCard> fetchByLat(Long... values) {
+    public List<fi.istrange.traveler.db.tables.pojos.PersonalCard> fetchByLat(BigDecimal... values) {
         return fetch(PersonalCard.PERSONAL_CARD.LAT, values);
     }
 
@@ -98,5 +99,12 @@ public class PersonalCardDao extends DAOImpl<PersonalCardRecord, fi.istrange.tra
      */
     public List<fi.istrange.traveler.db.tables.pojos.PersonalCard> fetchByUsernameFk(String... values) {
         return fetch(PersonalCard.PERSONAL_CARD.USERNAME_FK, values);
+    }
+
+    /**
+     * Fetch records that have <code>active IN (values)</code>
+     */
+    public List<fi.istrange.traveler.db.tables.pojos.PersonalCard> fetchByActive(Boolean... values) {
+        return fetch(PersonalCard.PERSONAL_CARD.ACTIVE, values);
     }
 }

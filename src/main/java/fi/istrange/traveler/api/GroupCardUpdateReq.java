@@ -1,7 +1,9 @@
 package fi.istrange.traveler.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 /**
@@ -11,18 +13,18 @@ public class GroupCardUpdateReq extends CardUpdateReq {
 
     private List<String> participants;
 
+    @JsonCreator
     public GroupCardUpdateReq(
-            Date startTime,
-            Date endTime,
-            Long lon,
-            Long lat,
-            List<String> participants
+            @JsonProperty("startTime") Date startTime,
+            @JsonProperty("endTime") Date endTime,
+            @JsonProperty("lon") BigDecimal lon,
+            @JsonProperty("lat") BigDecimal lat,
+            @JsonProperty("participants") List<String> participants
     ) {
         super(startTime, endTime, lon, lat);
         this.participants = participants;
     }
 
-    @JsonProperty
     public List<String> getParticipants() {
         return participants;
     }

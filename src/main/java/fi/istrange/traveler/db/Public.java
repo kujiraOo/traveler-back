@@ -4,15 +4,21 @@
 package fi.istrange.traveler.db;
 
 
-import fi.istrange.traveler.db.tables.*;
-import org.jooq.Catalog;
-import org.jooq.Table;
-import org.jooq.impl.SchemaImpl;
+import fi.istrange.traveler.db.tables.CardUser;
+import fi.istrange.traveler.db.tables.GroupCard;
+import fi.istrange.traveler.db.tables.PersonalCard;
+import fi.istrange.traveler.db.tables.TravelerUser;
+import fi.istrange.traveler.db.tables.UserCredentials;
 
-import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Generated;
+
+import org.jooq.Catalog;
+import org.jooq.Table;
+import org.jooq.impl.SchemaImpl;
 
 
 /**

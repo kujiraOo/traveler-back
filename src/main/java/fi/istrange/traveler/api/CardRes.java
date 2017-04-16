@@ -2,6 +2,7 @@ package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 /**
@@ -11,16 +12,16 @@ public class CardRes {
     private Long id;
     private Date startTime;
     private Date endTime;
-    private Long lon;
-    private Long lat;
+    private BigDecimal lon;
+    private BigDecimal lat;
     private UserProfileRes owner;
 
     public CardRes(
         Long id,
         Date startTime,
         Date endTime,
-        Long lon,
-        Long lat,
+        BigDecimal lon,
+        BigDecimal lat,
         UserProfileRes owner
     ) {
         this.id = id;
@@ -47,12 +48,12 @@ public class CardRes {
     }
 
     @JsonProperty
-    public Long getLatitude() {
+    public BigDecimal getLatitude() {
         return lat;
     }
 
     @JsonProperty
-    public Long getLongitude() {
+    public BigDecimal getLongitude() {
         return lon;
     }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fi.istrange.traveler.db.tables.pojos.GroupCard;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +21,8 @@ public class GroupCardRes extends CardRes {
         Long id,
         Date startTime,
         Date endTime,
-        Long lon,
-        Long lat,
+        BigDecimal lon,
+        BigDecimal lat,
         UserProfileRes owner,
         List<String> participants
     ) {

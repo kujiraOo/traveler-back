@@ -11,6 +11,7 @@ import org.jooq.*;
 import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupCard extends TableImpl<GroupCardRecord> {
 
-    private static final long serialVersionUID = -753210666;
+    private static final long serialVersionUID = -778699277;
 
     /**
      * The reference instance of <code>public.group_card</code>
@@ -62,17 +63,22 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
     /**
      * The column <code>public.group_card.lon</code>.
      */
-    public final TableField<GroupCardRecord, Long> LON = createField("lon", org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<GroupCardRecord, BigDecimal> LON = createField("lon", org.jooq.impl.SQLDataType.NUMERIC.precision(10, 7), this, "");
 
     /**
      * The column <code>public.group_card.lat</code>.
      */
-    public final TableField<GroupCardRecord, Long> LAT = createField("lat", org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<GroupCardRecord, BigDecimal> LAT = createField("lat", org.jooq.impl.SQLDataType.NUMERIC.precision(10, 7), this, "");
 
     /**
      * The column <code>public.group_card.owner_fk</code>.
      */
     public final TableField<GroupCardRecord, String> OWNER_FK = createField("owner_fk", org.jooq.impl.SQLDataType.CHAR.length(80).nullable(false), this, "");
+
+    /**
+     * The column <code>public.group_card.active</code>.
+     */
+    public final TableField<GroupCardRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
      * Create a <code>public.group_card</code> table reference

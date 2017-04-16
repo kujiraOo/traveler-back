@@ -1,10 +1,10 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.CardRes;
 import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.api.GroupCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.GroupCardLocationDao;
 import fi.istrange.traveler.dao.GroupCardParticipantDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -15,14 +15,15 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import org.jooq.DSLContext;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by arsenii on 4/7/17.
@@ -33,6 +34,7 @@ import java.util.List;
 @PermitAll
 public class GroupCardResource {
     private final GroupCardDao cardDAO;
+    private final GroupCardLocationDao locationDao;
     private final TravelerUserDao userDAO;
     private final GroupCardParticipantDao participantDAO;
 
@@ -42,18 +44,23 @@ public class GroupCardResource {
         this.cardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.participantDAO = new GroupCardParticipantDao();
+        this.locationDao = new GroupCardLocationDao();
     }
 
     @GET
     @ApiOperation(value = "Produces list of group travel cards aggregated by radius")
-    public List<CardRes> getGroupCards(
+    public List<GroupCardRes> getGroupCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @NotNull @QueryParam("lat") double lat,
-            @NotNull @QueryParam("lng") double lng
+            @NotNull @QueryParam("lat") BigDecimal lat,
+            @NotNull @QueryParam("lng") BigDecimal lng,
+            @Context DSLContext database
     ) {
-        // TODO get cards in radius of N kilometers for specified lon and lat
-
-        throw new NotImplementedException();
+        return locationDao.getCardsByLocation(lat, lng, database).stream()
+                .map(p -> GroupCardRes.fromEntity(
+                        p,
+                        participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),
+                        principal.getName()
+                )).collect(Collectors.toList());
     }
 
     @POST
@@ -103,10 +110,14 @@ public class GroupCardResource {
     @Path("/{id}")
     public GroupCardRes deactivateGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId
+            @PathParam("id") long cardId,
+            @Context DSLContext database
     ) {
-        // TODO deactivate card record
-        throw new NotImplementedException();
+        // TODO: change deletion logic to archival logic
+        cardDAO.deleteById(cardId);
+        participantDAO.deleteGroupCardParticipant(cardId, database);
+
+        return getGroupCard(principal, cardId, database);
     }
 
     private static GroupCard fromCreateReq(GroupCardCreationReq req, String username) {
@@ -116,7 +127,8 @@ public class GroupCardResource {
                 req.getEndTime(),
                 req.getLon(),
                 req.getLat(),
-                username
+                username,
+                true
         );
     }
 

@@ -72,7 +72,7 @@ public class UserCredentials implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("UserCredentialsView (");
+        StringBuilder sb = new StringBuilder("UserCredentials (");
 
         sb.append(username);
         sb.append(", ").append(password);

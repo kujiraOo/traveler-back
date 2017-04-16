@@ -4,17 +4,23 @@ import fi.istrange.traveler.api.PersonalCardCreationReq;
 import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.PersonalCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.PersonalCardLocationDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.PersonalCard;
 import io.dropwizard.auth.Auth;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
+import org.jooq.DSLContext;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,25 +35,26 @@ import java.util.stream.Collectors;
 public class PersonalCardResource {
     private final PersonalCardDao cardDAO;
     private final TravelerUserDao userDAO;
+    private final PersonalCardLocationDao locationDao;
 
     public PersonalCardResource(
             ApplicationBundle applicationBundle
     ) {
         this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.locationDao = new PersonalCardLocationDao();
     }
 
     @GET
     @ApiOperation(value = "Produces list of personal travel cards aggregated by radius")
     public List<PersonalCardRes> getPersonalCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @NotNull @QueryParam("lat") double lat,
-            @NotNull @QueryParam("lng") double lng
-    ) {
-        // TODO get cards in radius of N kilometers for specified lon and lat
-
-        return this.cardDAO.fetchByUsernameFk(principal.getName()) // TODO: usename based fetching should be removed
-                .stream().map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
+            @NotNull @QueryParam("lat") BigDecimal lat,
+            @NotNull @QueryParam("lng") BigDecimal lng,
+            @Context DSLContext database
+            ) {
+        return locationDao.getCardsByLocation(lat, lng, database).stream()
+                .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .collect(Collectors.toList());
     }
 
@@ -126,7 +133,8 @@ public class PersonalCardResource {
                 req.getEndTime(),
                 req.getLon(),
                 req.getLat(),
-                username
+                username,
+                true
         );
     }
 

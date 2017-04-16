@@ -4,6 +4,7 @@ import fi.istrange.traveler.api.UserCredentialsView;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.Tables;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookiePrincipal;
 import org.jooq.DSLContext;
@@ -27,7 +28,7 @@ public class AuthResource {
     }
 
     @POST
-    @Path("/login")
+    @ApiOperation("Log in")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public DefaultJwtCookiePrincipal login(
@@ -57,8 +58,8 @@ public class AuthResource {
         return principal;
     }
 
-    @POST
-    @Path("/logout")
+    @DELETE
+    @ApiOperation("Log out")
     public void logout(@Context ContainerRequestContext requestContext){
         JwtCookiePrincipal.removeFromContext(requestContext);
     }

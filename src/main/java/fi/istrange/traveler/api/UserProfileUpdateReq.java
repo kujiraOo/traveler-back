@@ -27,12 +27,12 @@ public class UserProfileUpdateReq {
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String email,
-            String gender,
-            Date birthday,
-            String phone,
-            String address,
-            String city,
-            String country
+            @JsonProperty("gender") String gender,
+            @JsonProperty("birthday") Date birthday,
+            @JsonProperty("phone") String phone,
+            @JsonProperty("address") String address,
+            @JsonProperty("city") String city,
+            @JsonProperty("country") String country
     ) {
         this.email = email;
         this.firstName = firstName;
