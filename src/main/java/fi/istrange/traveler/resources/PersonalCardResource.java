@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 @Api(value = "/personal-cards", tags = "personal cards")
 @PermitAll
 public class PersonalCardResource {
-    PersonalCardDao cardDAO;
-    TravelerUserDao userDAO;
+    private final PersonalCardDao cardDAO;
+    private final TravelerUserDao userDAO;
 
     public PersonalCardResource(
             ApplicationBundle applicationBundle

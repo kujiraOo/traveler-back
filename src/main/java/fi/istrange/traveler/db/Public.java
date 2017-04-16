@@ -4,20 +4,15 @@
 package fi.istrange.traveler.db;
 
 
-import fi.istrange.traveler.db.tables.CardUser;
-import fi.istrange.traveler.db.tables.GroupCard;
-import fi.istrange.traveler.db.tables.PersonalCard;
-import fi.istrange.traveler.db.tables.TravelerUser;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Generated;
-
+import fi.istrange.traveler.db.tables.*;
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -33,7 +28,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = -756406590;
+    private static final long serialVersionUID = 1106405146;
 
     /**
      * The reference instance of <code>public</code>
@@ -59,6 +54,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.traveler_user</code>.
      */
     public final TravelerUser TRAVELER_USER = fi.istrange.traveler.db.tables.TravelerUser.TRAVELER_USER;
+
+    /**
+     * The table <code>public.user_credentials</code>.
+     */
+    public final UserCredentials USER_CREDENTIALS = fi.istrange.traveler.db.tables.UserCredentials.USER_CREDENTIALS;
 
     /**
      * No further instances allowed
@@ -88,6 +88,7 @@ public class Public extends SchemaImpl {
             CardUser.CARD_USER,
             GroupCard.GROUP_CARD,
             PersonalCard.PERSONAL_CARD,
-            TravelerUser.TRAVELER_USER);
+            TravelerUser.TRAVELER_USER,
+            UserCredentials.USER_CREDENTIALS);
     }
 }

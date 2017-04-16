@@ -27,7 +27,7 @@ import java.util.List;
 @Api(value = "/group-cards", tags = "group cards")
 @PermitAll
 public class GroupCardResource {
-    GroupCardDao cardDAO;
+    private final GroupCardDao cardDAO;
 
     public GroupCardResource(
             ApplicationBundle applicationBundle
