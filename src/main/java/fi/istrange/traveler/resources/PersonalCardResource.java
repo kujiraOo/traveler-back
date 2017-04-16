@@ -111,19 +111,17 @@ public class PersonalCardResource {
 
     @DELETE
     @Path("/{id}")
-    @ApiOperation("Delete personal card")
+    @ApiOperation("Archive a personal card by id")
     public PersonalCardRes deactivatePersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId
     ) {
-        PersonalCardRes res = PersonalCardRes.fromEntity(
-                cardDAO.fetchOneById(personalCardId),
-                userDAO.fetchOneByUsername(principal.getName())
-        );
+        PersonalCard card = cardDAO.fetchOneById(personalCardId);
 
-        this.cardDAO.deleteById(personalCardId);
+        card.setActive(false);
+        cardDAO.update(card);
 
-        return res;
+        return PersonalCardRes.fromEntity(card, userDAO.fetchOneByUsername(principal.getName()));
     }
 
     private static PersonalCard fromCreateReq(PersonalCardCreationReq req, String username) {
