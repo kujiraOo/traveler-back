@@ -8,7 +8,6 @@ import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal
 import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookiePrincipal;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Result;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -40,13 +39,6 @@ public class AuthResource {
             throw new WebApplicationException(422);
         }
 
-        Result<Record> res = database.select()
-                .from(Tables.USER_CREDENTIALS).fetch();
-        System.out.println(res.size());
-        for (Record record : res) {
-            System.out.println(record);
-        }
-
         Optional<Record> result = database.select()
                 .from(Tables.USER_CREDENTIALS)
                 .where(Tables.USER_CREDENTIALS.USERNAME.equal(userCredentialsView.getName()))
@@ -54,7 +46,8 @@ public class AuthResource {
 
         if (
                 !result.isPresent() ||
-                !userCredentialsView.getPassword().equals(result.get().getValue(Tables.USER_CREDENTIALS.PASSWORD))
+                !userCredentialsView.getPassword().equals(result.get().getValue(Tables.USER_CREDENTIALS.PASSWORD)) ||
+                !result.get().getValue(Tables.USER_CREDENTIALS.ACTIVE)
         ) {
             throw new NotAuthorizedException("Invalid credentials");
         }

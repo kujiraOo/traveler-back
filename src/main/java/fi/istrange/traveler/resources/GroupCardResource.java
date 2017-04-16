@@ -5,17 +5,22 @@ import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.api.GroupCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.GroupCardParticipantDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
+import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
+import fi.istrange.traveler.db.tables.pojos.GroupCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
+import org.jooq.DSLContext;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -28,11 +33,15 @@ import java.util.List;
 @PermitAll
 public class GroupCardResource {
     private final GroupCardDao cardDAO;
+    private final TravelerUserDao userDAO;
+    private final GroupCardParticipantDao participantDAO;
 
     public GroupCardResource(
             ApplicationBundle applicationBundle
     ) {
         this.cardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.participantDAO = new GroupCardParticipantDao();
     }
 
     @GET
@@ -51,20 +60,28 @@ public class GroupCardResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public GroupCardRes createGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            GroupCardCreationReq groupCardCreationReq
+            GroupCardCreationReq groupCardCreationReq,
+            @Context DSLContext database
     ) {
-        // TODO put new card in the db
-        throw new NotImplementedException();
+        cardDAO.insert(fromCreateReq(groupCardCreationReq, principal.getName()));
+        groupCardCreationReq.getParticipants()
+                .forEach(p -> participantDAO.addGroupCardParticipant(groupCardCreationReq.getId(), p, database));
+
+        return getGroupCard(principal, groupCardCreationReq.getId(), database);
     }
 
     @GET
     @Path("/{id}")
     public GroupCardRes getGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId
+            @PathParam("id") long cardId,
+            @Context DSLContext database
     ) {
-        // TODO get card from the db
-        throw new NotImplementedException();
+        return GroupCardRes.fromEntity(
+                cardDAO.fetchOneById(cardId),
+                participantDAO.getGroupCardParticipants(cardId, database, userDAO),
+                principal.getName()
+        );
     }
 
     @PUT
@@ -72,11 +89,14 @@ public class GroupCardResource {
     @Path("/{id}")
     public GroupCardRes updateGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId,
-            GroupCardUpdateReq groupCardUpdateReq
+            @PathParam("id") long cardId,
+            GroupCardUpdateReq groupCardUpdateReq,
+            @Context DSLContext database
     ) {
-        // TODO update card in the db
-        throw new NotImplementedException();
+        cardDAO.update(fromUpdateReq(groupCardUpdateReq, cardDAO.fetchOneById(cardId)));
+        participantDAO.updateGroupCardParticipants(cardId, groupCardUpdateReq.getParticipants(), database);
+
+        return getGroupCard(principal, cardId, database);
     }
 
     @DELETE
@@ -87,5 +107,25 @@ public class GroupCardResource {
     ) {
         // TODO deactivate card record
         throw new NotImplementedException();
+    }
+
+    private static GroupCard fromCreateReq(GroupCardCreationReq req, String username) {
+        return new GroupCard(
+                req.getId(),
+                req.getStartTime(),
+                req.getEndTime(),
+                req.getLon(),
+                req.getLat(),
+                username
+        );
+    }
+
+    private static GroupCard fromUpdateReq(GroupCardUpdateReq req, GroupCard card) {
+        card.setStartTime(req.getStartTime());
+        card.setEndTime(req.getEndTime());
+        card.setLon(req.getLon());
+        card.setLat(req.getLat());
+
+        return card;
     }
 }

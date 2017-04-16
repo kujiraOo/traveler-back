@@ -1,22 +1,26 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.GroupCardRes;
+import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.UserProfileRes;
 import fi.istrange.traveler.api.UserProfileUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.GroupCardParticipantDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.jooq.DSLContext;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +37,7 @@ public class ProfileResource {
     private final TravelerUserDao userDAO;
     private final PersonalCardDao personalCardDao;
     private final GroupCardDao groupCardDao;
+    private final GroupCardParticipantDao participantDao;
 
     @Inject
     public ProfileResource(
@@ -41,6 +46,7 @@ public class ProfileResource {
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         groupCardDao = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        participantDao = new GroupCardParticipantDao();
     }
 
     @GET
@@ -68,15 +74,6 @@ public class ProfileResource {
         return getUserProfile(principal);
     }
 
-    @DELETE
-    @ApiOperation("Deactivate user")
-    public UserProfileRes deactivateUser(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
-    ) {
-        // TODO use user DAO to deactivate user's profile
-        throw new NotImplementedException();
-    }
-
     @GET
     @Path("/personal-cards")
     @ApiOperation(value = "Produces list of personal travel cards created by user")
@@ -94,10 +91,17 @@ public class ProfileResource {
     @Path("/group-cards")
     @ApiOperation(value = "Produces list of group travel cards created by user")
     public List<GroupCardRes> getGroupCards(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
-    ) {
-        // TODO access DAO here and get list of group cards
-        throw new NotImplementedException();
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @Context DSLContext database
+            ) {
+        return groupCardDao.fetchByOwnerFk(principal.getName())
+                .stream()
+                .map(p -> GroupCardRes.fromEntity(
+                        p,
+                        participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
+                        principal.getName())
+                )
+                .collect(Collectors.toList());
     }
 
     private static TravelerUser fromUpdateReq (UserProfileUpdateReq req, TravelerUser user) {

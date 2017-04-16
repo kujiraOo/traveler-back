@@ -1,8 +1,8 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.CardCreationReq;
+import fi.istrange.traveler.api.PersonalCardCreationReq;
 import fi.istrange.traveler.api.PersonalCardRes;
-import fi.istrange.traveler.api.CardUpdateReq;
+import fi.istrange.traveler.api.PersonalCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -46,7 +46,7 @@ public class PersonalCardResource {
     ) {
         // TODO get cards in radius of N kilometers for specified lon and lat
 
-        return this.cardDAO.fetchByUsernameFk(principal.getName())
+        return this.cardDAO.fetchByUsernameFk(principal.getName()) // TODO: usename based fetching should be removed
                 .stream().map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .collect(Collectors.toList());
     }
@@ -56,7 +56,7 @@ public class PersonalCardResource {
     @ApiOperation("Create new personal card")
     public PersonalCardRes createPersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            CardCreationReq personalCardCreationReq
+            PersonalCardCreationReq personalCardCreationReq
     ) {
         this.cardDAO.insert(fromCreateReq(personalCardCreationReq, principal.getName()));
 
@@ -87,7 +87,7 @@ public class PersonalCardResource {
     public PersonalCardRes updatePersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId,
-            CardUpdateReq cardUpdateReq
+            PersonalCardUpdateReq cardUpdateReq
     ) {
         this.cardDAO.update(
                 fromUpdateReq(
@@ -119,7 +119,7 @@ public class PersonalCardResource {
         return res;
     }
 
-    private static PersonalCard fromCreateReq(CardCreationReq req, String username) {
+    private static PersonalCard fromCreateReq(PersonalCardCreationReq req, String username) {
         return new PersonalCard(
                 req.getId(),
                 req.getStartTime(),
@@ -130,7 +130,7 @@ public class PersonalCardResource {
         );
     }
 
-    private static PersonalCard fromUpdateReq(CardUpdateReq req, PersonalCard card) {
+    private static PersonalCard fromUpdateReq(PersonalCardUpdateReq req, PersonalCard card) {
         card.setStartTime(req.getStartTime());
         card.setEndTime(req.getEndTime());
         card.setLon(req.getLon());
