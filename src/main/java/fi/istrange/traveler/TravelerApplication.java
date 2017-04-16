@@ -52,6 +52,8 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
 
         bootstrap.addBundle(new AssetsBundle());
 
+
+
         bootstrap.addBundle(new MigrationsBundle<TravelerConfiguration>() {
             @Override
             public DataSourceFactory getDataSourceFactory(TravelerConfiguration configuration) {
@@ -70,8 +72,6 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) ->
                 ((TravelerConfiguration) configuration).getJwtCookieAuth()));
 
-
-        // remove the commets when the actual DB can be instantiated
-//        bootstrap.addBundle(applicationBundle.getJooqBundle());
+        bootstrap.addBundle(applicationBundle.getJooqBundle());
     }
 }

@@ -32,9 +32,9 @@ jwtCookieAuth:
 
 database:
   driverClass: org.postgresql.Driver
-  user: ${(env.DB_USER)!"test"}
-  password: ${(env.DB_PASSWORD)!"test"}
-  url: jdbc:postgresql://${(env.DB_HOST)!"127.0.0.1"}:${(env.DB_PORT)!"5432"}/${(env.DB_NAME)!"traveler_test"}
+  user: postgres
+  password:
+  url: jdbc:postgresql://127.0.0.1:5432/traveler
 
 jooq:
   # The flavor of SQL to generate. If not specified, it will be inferred from the JDBC connection URL.  (default: null)

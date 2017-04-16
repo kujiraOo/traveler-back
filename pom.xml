@@ -66,14 +66,6 @@
         <postgres.version>9.4.1212</postgres.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>bintray-jcenter</id>
-            <name>Bintray JCenter</name>
-            <url>http://jcenter.bintray.com</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.postgresql</groupId>

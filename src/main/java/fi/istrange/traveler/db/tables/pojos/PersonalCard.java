@@ -4,10 +4,10 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
-import java.io.Serializable;
-import java.sql.Date;
-
 import javax.annotation.Generated;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Date;
 
 
 /**
@@ -23,14 +23,15 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonalCard implements Serializable {
 
-    private static final long serialVersionUID = -427060332;
+    private static final long serialVersionUID = -1832066599;
 
-    private Integer id;
-    private Date    startTime;
-    private Date    endTime;
-    private Long    lon;
-    private Long    lat;
-    private String  usernameFk;
+    private Long       id;
+    private Date       startTime;
+    private Date       endTime;
+    private BigDecimal lon;
+    private BigDecimal lat;
+    private String     usernameFk;
+    private Boolean    active;
 
     public PersonalCard() {}
 
@@ -41,15 +42,17 @@ public class PersonalCard implements Serializable {
         this.lon = value.lon;
         this.lat = value.lat;
         this.usernameFk = value.usernameFk;
+        this.active = value.active;
     }
 
     public PersonalCard(
-        Integer id,
-        Date    startTime,
-        Date    endTime,
-        Long    lon,
-        Long    lat,
-        String  usernameFk
+        Long       id,
+        Date       startTime,
+        Date       endTime,
+        BigDecimal lon,
+        BigDecimal lat,
+        String     usernameFk,
+        Boolean    active
     ) {
         this.id = id;
         this.startTime = startTime;
@@ -57,13 +60,14 @@ public class PersonalCard implements Serializable {
         this.lon = lon;
         this.lat = lat;
         this.usernameFk = usernameFk;
+        this.active = active;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -83,19 +87,19 @@ public class PersonalCard implements Serializable {
         this.endTime = endTime;
     }
 
-    public Long getLon() {
+    public BigDecimal getLon() {
         return this.lon;
     }
 
-    public void setLon(Long lon) {
+    public void setLon(BigDecimal lon) {
         this.lon = lon;
     }
 
-    public Long getLat() {
+    public BigDecimal getLat() {
         return this.lat;
     }
 
-    public void setLat(Long lat) {
+    public void setLat(BigDecimal lat) {
         this.lat = lat;
     }
 
@@ -105,6 +109,14 @@ public class PersonalCard implements Serializable {
 
     public void setUsernameFk(String usernameFk) {
         this.usernameFk = usernameFk;
+    }
+
+    public Boolean getActive() {
+        return this.active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override
@@ -117,6 +129,7 @@ public class PersonalCard implements Serializable {
         sb.append(", ").append(lon);
         sb.append(", ").append(lat);
         sb.append(", ").append(usernameFk);
+        sb.append(", ").append(active);
 
         sb.append(")");
         return sb.toString();

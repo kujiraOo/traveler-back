@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Created by arsenii on 11/04/2017.
  */
-public class UserCredentials {
+public class UserCredentialsView {
     private String name;
     private String password;
 

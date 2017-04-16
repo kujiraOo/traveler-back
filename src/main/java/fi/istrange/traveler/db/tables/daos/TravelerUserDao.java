@@ -6,12 +6,14 @@ package fi.istrange.traveler.db.tables.daos;
 
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.records.TravelerUserRecord;
-import org.jooq.Configuration;
-import org.jooq.impl.DAOImpl;
 
-import javax.annotation.Generated;
 import java.sql.Date;
 import java.util.List;
+
+import javax.annotation.Generated;
+
+import org.jooq.Configuration;
+import org.jooq.impl.DAOImpl;
 
 
 /**

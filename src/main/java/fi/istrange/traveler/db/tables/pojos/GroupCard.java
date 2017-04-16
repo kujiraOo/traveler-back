@@ -4,10 +4,10 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
-import java.io.Serializable;
-import java.sql.Date;
-
 import javax.annotation.Generated;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Date;
 
 
 /**
@@ -23,13 +23,15 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupCard implements Serializable {
 
-    private static final long serialVersionUID = -760629013;
+    private static final long serialVersionUID = -952901318;
 
-    private Integer id;
-    private Date    startTime;
-    private Date    endTime;
-    private Long    lon;
-    private Long    lat;
+    private Long       id;
+    private Date       startTime;
+    private Date       endTime;
+    private BigDecimal lon;
+    private BigDecimal lat;
+    private String     ownerFk;
+    private Boolean    active;
 
     public GroupCard() {}
 
@@ -39,27 +41,33 @@ public class GroupCard implements Serializable {
         this.endTime = value.endTime;
         this.lon = value.lon;
         this.lat = value.lat;
+        this.ownerFk = value.ownerFk;
+        this.active = value.active;
     }
 
     public GroupCard(
-        Integer id,
-        Date    startTime,
-        Date    endTime,
-        Long    lon,
-        Long    lat
+        Long       id,
+        Date       startTime,
+        Date       endTime,
+        BigDecimal lon,
+        BigDecimal lat,
+        String     ownerFk,
+        Boolean    active
     ) {
         this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
         this.lon = lon;
         this.lat = lat;
+        this.ownerFk = ownerFk;
+        this.active = active;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -79,20 +87,36 @@ public class GroupCard implements Serializable {
         this.endTime = endTime;
     }
 
-    public Long getLon() {
+    public BigDecimal getLon() {
         return this.lon;
     }
 
-    public void setLon(Long lon) {
+    public void setLon(BigDecimal lon) {
         this.lon = lon;
     }
 
-    public Long getLat() {
+    public BigDecimal getLat() {
         return this.lat;
     }
 
-    public void setLat(Long lat) {
+    public void setLat(BigDecimal lat) {
         this.lat = lat;
+    }
+
+    public String getOwnerFk() {
+        return this.ownerFk;
+    }
+
+    public void setOwnerFk(String ownerFk) {
+        this.ownerFk = ownerFk;
+    }
+
+    public Boolean getActive() {
+        return this.active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override
@@ -104,6 +128,8 @@ public class GroupCard implements Serializable {
         sb.append(", ").append(endTime);
         sb.append(", ").append(lon);
         sb.append(", ").append(lat);
+        sb.append(", ").append(ownerFk);
+        sb.append(", ").append(active);
 
         sb.append(")");
         return sb.toString();

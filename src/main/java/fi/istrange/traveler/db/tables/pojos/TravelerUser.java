@@ -4,9 +4,10 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
-import javax.annotation.Generated;
 import java.io.Serializable;
 import java.sql.Date;
+
+import javax.annotation.Generated;
 
 
 /**
