@@ -2,7 +2,7 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserRegistrationReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.db.Tables;
+import fi.istrange.traveler.dao.UserCredentialDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
@@ -26,12 +26,14 @@ import javax.ws.rs.core.Response;
 @Api(value = "/users", tags = "users")
 public class UserResource {
     private final TravelerUserDao userDAO;
+    private final UserCredentialDao credentialDao;
 
     @Inject
     public UserResource(
             ApplicationBundle applicationBundle
     ) {
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
+        credentialDao = new UserCredentialDao();
     }
 
     @POST
@@ -42,14 +44,7 @@ public class UserResource {
             @Context DSLContext database
     ) {
         userDAO.insert(fromRegisterReq(newUser));
-        database.insertInto(
-                Tables.USER_CREDENTIALS,
-                Tables.USER_CREDENTIALS.USERNAME,
-                Tables.USER_CREDENTIALS.PASSWORD,
-                Tables.USER_CREDENTIALS.ACTIVE
-                )
-                .values(newUser.getUsername(), newUser.getPassword(), true)
-                .execute();
+        credentialDao.addUser(newUser.getUsername(), newUser.getPassword(), database);
 
         return Response.accepted().build();
     }
@@ -60,10 +55,7 @@ public class UserResource {
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @Context DSLContext database
     ) {
-        database.update(Tables.USER_CREDENTIALS)
-                .set(Tables.USER_CREDENTIALS.ACTIVE, false)
-                .where(Tables.USER_CREDENTIALS.USERNAME.equal(principal.getName()))
-                .execute();
+        credentialDao.deactivateUser(principal.getName(), database);
 
         return Response.accepted().build();
     }
