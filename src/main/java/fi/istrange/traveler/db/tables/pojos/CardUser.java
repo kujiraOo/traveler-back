@@ -4,9 +4,8 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
-import java.io.Serializable;
-
 import javax.annotation.Generated;
+import java.io.Serializable;
 
 
 /**
@@ -22,10 +21,10 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CardUser implements Serializable {
 
-    private static final long serialVersionUID = -260541704;
+    private static final long serialVersionUID = -2056935920;
 
-    private Integer cardId;
-    private String  username;
+    private Long   cardId;
+    private String username;
 
     public CardUser() {}
 
@@ -35,18 +34,18 @@ public class CardUser implements Serializable {
     }
 
     public CardUser(
-        Integer cardId,
-        String  username
+        Long   cardId,
+        String username
     ) {
         this.cardId = cardId;
         this.username = username;
     }
 
-    public Integer getCardId() {
+    public Long getCardId() {
         return this.cardId;
     }
 
-    public void setCardId(Integer cardId) {
+    public void setCardId(Long cardId) {
         this.cardId = cardId;
     }
 

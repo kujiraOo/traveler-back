@@ -23,14 +23,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonalCard implements Serializable {
 
-    private static final long serialVersionUID = -427060332;
+    private static final long serialVersionUID = 452068484;
 
-    private Integer id;
-    private Date    startTime;
-    private Date    endTime;
-    private Long    lon;
-    private Long    lat;
-    private String  usernameFk;
+    private Long   id;
+    private Date   startTime;
+    private Date   endTime;
+    private Long   lon;
+    private Long   lat;
+    private String usernameFk;
 
     public PersonalCard() {}
 
@@ -44,12 +44,12 @@ public class PersonalCard implements Serializable {
     }
 
     public PersonalCard(
-        Integer id,
-        Date    startTime,
-        Date    endTime,
-        Long    lon,
-        Long    lat,
-        String  usernameFk
+        Long   id,
+        Date   startTime,
+        Date   endTime,
+        Long   lon,
+        Long   lat,
+        String usernameFk
     ) {
         this.id = id;
         this.startTime = startTime;
@@ -59,11 +59,11 @@ public class PersonalCard implements Serializable {
         this.usernameFk = usernameFk;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

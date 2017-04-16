@@ -1,10 +1,11 @@
 package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.CardCreationReq;
-import fi.istrange.traveler.api.CardRes;
+import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.CardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
+import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.PersonalCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
@@ -27,16 +28,18 @@ import java.util.stream.Collectors;
 @PermitAll
 public class PersonalCardResource {
     PersonalCardDao cardDAO;
+    TravelerUserDao userDAO;
 
     public PersonalCardResource(
             ApplicationBundle applicationBundle
     ) {
         this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET
     @ApiOperation(value = "Produces list of personal travel cards aggregated by radius")
-    public List<CardRes> getPersonalCards(
+    public List<PersonalCardRes> getPersonalCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @NotNull @QueryParam("lat") double lat,
             @NotNull @QueryParam("lng") double lng
@@ -44,33 +47,36 @@ public class PersonalCardResource {
         // TODO get cards in radius of N kilometers for specified lon and lat
 
         return this.cardDAO.fetchByUsernameFk(principal.getName())
-                .stream().map(CardRes::fromEntity)
+                .stream().map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .collect(Collectors.toList());
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Create new personal card")
-    public CardRes createPersonalCard(
+    public PersonalCardRes createPersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             CardCreationReq personalCardCreationReq
     ) {
         this.cardDAO.insert(fromCreateReq(personalCardCreationReq, principal.getName()));
 
-        return CardRes.fromEntity(this.cardDAO.fetchOneById(personalCardCreationReq.getId().intValue()));
+        return PersonalCardRes.fromEntity(
+                this.cardDAO.fetchOneById(personalCardCreationReq.getId()),
+                userDAO.fetchOneByUsername(principal.getName())
+        );
     }
 
     @GET
     @Path("/{id}")
     @ApiOperation("Get a personal card by id")
-    public Optional<CardRes> getPersonalCard(
+    public Optional<PersonalCardRes> getPersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId
     ) {
         return this.cardDAO.fetchByUsernameFk(principal.getName())
                 .stream()
                 .filter(p -> p.getId() == personalCardId)
-                .map(CardRes::fromEntity)
+                .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .findFirst();
     }
 
@@ -78,7 +84,7 @@ public class PersonalCardResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     @ApiOperation("Update a personal card")
-    public CardRes updatePersonalCard(
+    public PersonalCardRes updatePersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId,
             CardUpdateReq cardUpdateReq
@@ -86,29 +92,36 @@ public class PersonalCardResource {
         this.cardDAO.update(
                 fromUpdateReq(
                         cardUpdateReq,
-                        cardDAO.fetchOneById((int)personalCardId)
+                        cardDAO.fetchOneById(personalCardId)
                 )
         );
 
-        return CardRes.fromEntity(this.cardDAO.fetchOneById((int) personalCardId));
+        return PersonalCardRes.fromEntity(
+                this.cardDAO.fetchOneById(personalCardId),
+                userDAO.fetchOneByUsername(principal.getName())
+        );
     }
 
     @DELETE
     @Path("/{id}")
     @ApiOperation("Delete personal card")
-    public CardRes deactivatePersonalCard(
+    public PersonalCardRes deactivatePersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId
     ) {
-        CardRes res = CardRes.fromEntity(cardDAO.fetchOneById((int)personalCardId));
-        this.cardDAO.deleteById((int) personalCardId);
+        PersonalCardRes res = PersonalCardRes.fromEntity(
+                cardDAO.fetchOneById(personalCardId),
+                userDAO.fetchOneByUsername(principal.getName())
+        );
+
+        this.cardDAO.deleteById(personalCardId);
 
         return res;
     }
 
     private static PersonalCard fromCreateReq(CardCreationReq req, String username) {
         return new PersonalCard(
-                req.getId().intValue(),
+                req.getId(),
                 req.getStartTime(),
                 req.getEndTime(),
                 req.getLon(),

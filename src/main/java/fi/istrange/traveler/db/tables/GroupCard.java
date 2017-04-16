@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupCard extends TableImpl<GroupCardRecord> {
 
-    private static final long serialVersionUID = 1878257897;
+    private static final long serialVersionUID = -753210666;
 
     /**
      * The reference instance of <code>public.group_card</code>
@@ -47,7 +47,7 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
     /**
      * The column <code>public.group_card.id</code>.
      */
-    public final TableField<GroupCardRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<GroupCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.group_card.start_time</code>.
@@ -68,6 +68,11 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
      * The column <code>public.group_card.lat</code>.
      */
     public final TableField<GroupCardRecord, Long> LAT = createField("lat", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>public.group_card.owner_fk</code>.
+     */
+    public final TableField<GroupCardRecord, String> OWNER_FK = createField("owner_fk", org.jooq.impl.SQLDataType.CHAR.length(80).nullable(false), this, "");
 
     /**
      * Create a <code>public.group_card</code> table reference

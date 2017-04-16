@@ -1,6 +1,6 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.CardRes;
+import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.api.UserProfileRes;
 import fi.istrange.traveler.api.UserProfileUpdateReq;
@@ -80,12 +80,13 @@ public class ProfileResource {
     @GET
     @Path("/personal-cards")
     @ApiOperation(value = "Produces list of personal travel cards created by user")
-    public List<CardRes> getPersonalCards(
+    public List<PersonalCardRes> getPersonalCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
     ) {
+        TravelerUser user = userDAO.fetchOneByUsername(principal.getName());
 
         return this.personalCardDao.fetchByUsernameFk(principal.getName())
-                .stream().map(CardRes::fromEntity)
+                .stream().map(p -> PersonalCardRes.fromEntity(p, user))
                 .collect(Collectors.toList());
     }
 

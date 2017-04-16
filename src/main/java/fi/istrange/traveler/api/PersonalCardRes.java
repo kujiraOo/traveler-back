@@ -1,28 +1,34 @@
 package fi.istrange.traveler.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Date;
+import fi.istrange.traveler.db.tables.pojos.PersonalCard;
+import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 
 /**
  * Created by arsenii on 4/8/17.
  */
 
 
-public class PersonalCardRes {
+public class PersonalCardRes extends CardRes {
 
-    private long id = 25;
-    private Date arrivalDateTime;
-
-    public PersonalCardRes() {}
-
-    @JsonProperty
-    public long getId() {
-        return id;
+    public PersonalCardRes(
+        Long id,
+        java.sql.Date startTime,
+        java.sql.Date endTime,
+        Long lon,
+        Long lat,
+        UserProfileRes owner
+    ) {
+        super(id, startTime, endTime, lon, lat, owner);
     }
 
-    @JsonProperty
-    public Date getArrivalDateTime() {
-        return arrivalDateTime;
+    public static PersonalCardRes fromEntity(PersonalCard card, TravelerUser user) {
+        return new PersonalCardRes(
+                card.getId(),
+                card.getStartTime(),
+                card.getEndTime(),
+                card.getLon(),
+                card.getLat(),
+                UserProfileRes.fromEntity(user)
+        );
     }
 }

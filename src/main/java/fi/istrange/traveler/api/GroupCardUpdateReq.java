@@ -2,21 +2,28 @@ package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
-
+import java.sql.Date;
+import java.util.List;
 /**
  * Created by arsenii on 4/8/17.
  */
-public class GroupCardUpdateReq {
+public class GroupCardUpdateReq extends CardUpdateReq {
 
-    //TODO just placeholder, populate later or replace with smth better
+    private List<String> participants;
 
-    private Date arrivalDateTime;
-
-    public GroupCardUpdateReq() {}
+    public GroupCardUpdateReq(
+            Date startTime,
+            Date endTime,
+            Long lon,
+            Long lat,
+            List<String> participants
+    ) {
+        super(startTime, endTime, lon, lat);
+        this.participants = participants;
+    }
 
     @JsonProperty
-    public Date getArrivalDateTime() {
-        return arrivalDateTime;
+    public List<String> getParticipants() {
+        return participants;
     }
 }

@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonalCard extends TableImpl<PersonalCardRecord> {
 
-    private static final long serialVersionUID = -111917777;
+    private static final long serialVersionUID = -1784966836;
 
     /**
      * The reference instance of <code>public.personal_card</code>
@@ -47,7 +47,7 @@ public class PersonalCard extends TableImpl<PersonalCardRecord> {
     /**
      * The column <code>public.personal_card.id</code>.
      */
-    public final TableField<PersonalCardRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<PersonalCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.personal_card.start_time</code>.

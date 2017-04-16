@@ -4,10 +4,9 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.sql.Date;
-
-import javax.annotation.Generated;
 
 
 /**
@@ -23,13 +22,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupCard implements Serializable {
 
-    private static final long serialVersionUID = -760629013;
+    private static final long serialVersionUID = -355753265;
 
-    private Integer id;
-    private Date    startTime;
-    private Date    endTime;
-    private Long    lon;
-    private Long    lat;
+    private Long   id;
+    private Date   startTime;
+    private Date   endTime;
+    private Long   lon;
+    private Long   lat;
+    private String ownerFk;
 
     public GroupCard() {}
 
@@ -39,27 +39,30 @@ public class GroupCard implements Serializable {
         this.endTime = value.endTime;
         this.lon = value.lon;
         this.lat = value.lat;
+        this.ownerFk = value.ownerFk;
     }
 
     public GroupCard(
-        Integer id,
-        Date    startTime,
-        Date    endTime,
-        Long    lon,
-        Long    lat
+        Long   id,
+        Date   startTime,
+        Date   endTime,
+        Long   lon,
+        Long   lat,
+        String ownerFk
     ) {
         this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
         this.lon = lon;
         this.lat = lat;
+        this.ownerFk = ownerFk;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -95,6 +98,14 @@ public class GroupCard implements Serializable {
         this.lat = lat;
     }
 
+    public String getOwnerFk() {
+        return this.ownerFk;
+    }
+
+    public void setOwnerFk(String ownerFk) {
+        this.ownerFk = ownerFk;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("GroupCard (");
@@ -104,6 +115,7 @@ public class GroupCard implements Serializable {
         sb.append(", ").append(endTime);
         sb.append(", ").append(lon);
         sb.append(", ").append(lat);
+        sb.append(", ").append(ownerFk);
 
         sb.append(")");
         return sb.toString();

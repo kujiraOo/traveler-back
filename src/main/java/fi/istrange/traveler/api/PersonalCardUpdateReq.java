@@ -1,27 +1,16 @@
 package fi.istrange.traveler.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Date;
-
 /**
  * Created by arsenii on 4/8/17.
  */
-public class PersonalCardUpdateReq {
+public class PersonalCardUpdateReq extends CardUpdateReq {
 
-    //TODO just placeholder, populate later or replace with smth better
-    private Date arrivalDateTime;
-
-    @JsonCreator
     public PersonalCardUpdateReq(
-            @JsonProperty("arrivalDateTime") Date arrivalDateTime
+            java.sql.Date startTime,
+            java.sql.Date endTime,
+            Long lon,
+            Long lat
     ) {
-        this.arrivalDateTime = arrivalDateTime;
-    }
-
-    @JsonProperty
-    public Date getArrivalDateTime() {
-        return arrivalDateTime;
+        super(startTime, endTime, lon, lat);
     }
 }

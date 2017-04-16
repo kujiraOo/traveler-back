@@ -5,14 +5,16 @@ package fi.istrange.traveler.db.tables.records;
 
 
 import fi.istrange.traveler.db.tables.TravelerUser;
+
+import java.sql.Date;
+
+import javax.annotation.Generated;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record11;
 import org.jooq.Row11;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import javax.annotation.Generated;
-import java.sql.Date;
 
 
 /**

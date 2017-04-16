@@ -1,7 +1,6 @@
 package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fi.istrange.traveler.db.tables.pojos.*;
 
 import java.sql.Date;
 
@@ -9,24 +8,31 @@ import java.sql.Date;
  * Created by aleksandr on 11.4.2017.
  */
 public class CardRes {
-    private Integer id;
+    private Long id;
     private Date startTime;
     private Date endTime;
     private Long lon;
     private Long lat;
+    private UserProfileRes owner;
 
     public CardRes(
-        Integer id,
+        Long id,
         Date startTime,
         Date endTime,
         Long lon,
-        Long lat
+        Long lat,
+        UserProfileRes owner
     ) {
-
+        this.id = id;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.lon = lon;
+        this.lat = lat;
+        this.owner = owner;
     }
 
     @JsonProperty
-    public Integer getID() {
+    public Long getID() {
         return id;
     }
 
@@ -50,23 +56,8 @@ public class CardRes {
         return lon;
     }
 
-    public static CardRes fromEntity(GroupCard card) {
-        return new CardRes(
-                card.getId(),
-                card.getStartTime(),
-                card.getEndTime(),
-                card.getLon(),
-                card.getLat()
-        );
-    }
-
-    public static CardRes fromEntity(PersonalCard card) {
-        return new CardRes(
-                card.getId(),
-                card.getStartTime(),
-                card.getEndTime(),
-                card.getLon(),
-                card.getLat()
-        );
+    @JsonProperty
+    public UserProfileRes getOwner() {
+        return owner;
     }
 }

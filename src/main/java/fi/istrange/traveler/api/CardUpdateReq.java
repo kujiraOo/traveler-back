@@ -24,6 +24,7 @@ public class CardUpdateReq {
         this.lon = lon;
         this.lat = lat;
     }
+
     @JsonProperty
     public Date getStartTime() {
         return startTime;
