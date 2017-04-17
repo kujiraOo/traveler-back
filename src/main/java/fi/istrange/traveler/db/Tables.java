@@ -9,6 +9,7 @@ import fi.istrange.traveler.db.tables.GroupCard;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
+import fi.istrange.traveler.db.tables.UserPhoto;
 
 import javax.annotation.Generated;
 
@@ -50,4 +51,9 @@ public class Tables {
      * The table <code>public.user_credentials</code>.
      */
     public static final UserCredentials USER_CREDENTIALS = fi.istrange.traveler.db.tables.UserCredentials.USER_CREDENTIALS;
+
+    /**
+     * The table <code>public.user_photo</code>.
+     */
+    public static final UserPhoto USER_PHOTO = fi.istrange.traveler.db.tables.UserPhoto.USER_PHOTO;
 }

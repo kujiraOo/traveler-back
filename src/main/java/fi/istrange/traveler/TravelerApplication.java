@@ -14,6 +14,7 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookieAuthBundle;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 /**
  * Created by aleksandr on 26.3.2017.
@@ -29,13 +30,13 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
+        environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(new AuthResource(applicationBundle));
         environment.jersey().register(new PersonalCardResource(applicationBundle));
         environment.jersey().register(new GroupCardResource(applicationBundle));
         environment.jersey().register(new UserResource(applicationBundle));
         environment.jersey().register(new ProfileResource(applicationBundle));
-
-
+        environment.jersey().register(new ImageResource(applicationBundle));
     }
 
     @Override

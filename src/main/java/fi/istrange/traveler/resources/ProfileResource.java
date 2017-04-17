@@ -6,8 +6,6 @@ import fi.istrange.traveler.api.UserProfileRes;
 import fi.istrange.traveler.api.UserProfileUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.*;
-import fi.istrange.traveler.db.tables.daos.GroupCardDao;
-import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
@@ -15,6 +13,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.jooq.DSLContext;
 
 import javax.annotation.security.PermitAll;
@@ -22,6 +22,9 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +38,7 @@ import java.util.stream.Collectors;
 public class ProfileResource {
 
     private final TravelerUserDao userDAO;
-    private final PersonalCardDao personalCardDao;
-    private final GroupCardDao groupCardDao;
+    private final UserPhotoDao userPhotoDao;
     private final GroupCardParticipantDao participantDao;
     private final GroupCardCustomDao customGroupCardDao;
     private final PersonalCardCustomDao customPersonalCardDao;
@@ -46,11 +48,10 @@ public class ProfileResource {
             ApplicationBundle applicationBundle
     ) {
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
-        groupCardDao = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
         customGroupCardDao = new GroupCardCustomDao();
         customPersonalCardDao = new PersonalCardCustomDao();
+        userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET
@@ -58,7 +59,9 @@ public class ProfileResource {
     public UserProfileRes getUserProfile(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
     ) {
-        return UserProfileRes.fromEntity(this.userDAO.fetchOneByUsername(principal.getName()));
+        return UserProfileRes.fromEntity(
+                this.userDAO.fetchOneByUsername(principal.getName())
+        );
     }
 
     @PUT
@@ -113,6 +116,20 @@ public class ProfileResource {
                 )
                 .collect(Collectors.toList());
     }
+
+    @POST
+    @Path("/photos")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public UserProfileRes uploadPhoto(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @FormDataParam("file") InputStream uploadedPhotoStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail
+    ) throws IOException, SQLException {
+
+        userPhotoDao.addPhoto(principal.getName(), uploadedPhotoStream);
+        return getUserProfile(principal);
+    }
+
 
     private static TravelerUser fromUpdateReq (UserProfileUpdateReq req, TravelerUser user) {
         user.setFirstName(req.getFirstName());

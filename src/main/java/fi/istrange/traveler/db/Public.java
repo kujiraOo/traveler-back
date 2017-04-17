@@ -9,6 +9,7 @@ import fi.istrange.traveler.db.tables.GroupCard;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
+import fi.istrange.traveler.db.tables.UserPhoto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +35,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1106405146;
+    private static final long serialVersionUID = 1519723164;
 
     /**
      * The reference instance of <code>public</code>
@@ -67,6 +68,11 @@ public class Public extends SchemaImpl {
     public final UserCredentials USER_CREDENTIALS = fi.istrange.traveler.db.tables.UserCredentials.USER_CREDENTIALS;
 
     /**
+     * The table <code>public.user_photo</code>.
+     */
+    public final UserPhoto USER_PHOTO = fi.istrange.traveler.db.tables.UserPhoto.USER_PHOTO;
+
+    /**
      * No further instances allowed
      */
     private Public() {
@@ -95,6 +101,7 @@ public class Public extends SchemaImpl {
             GroupCard.GROUP_CARD,
             PersonalCard.PERSONAL_CARD,
             TravelerUser.TRAVELER_USER,
-            UserCredentials.USER_CREDENTIALS);
+            UserCredentials.USER_CREDENTIALS,
+            UserPhoto.USER_PHOTO);
     }
 }
