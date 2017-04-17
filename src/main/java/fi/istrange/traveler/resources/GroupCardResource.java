@@ -54,11 +54,14 @@ public class GroupCardResource {
             @NotNull @QueryParam("lat") BigDecimal lat,
             @NotNull @QueryParam("lng") BigDecimal lng,
             @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
+            @QueryParam("offset") @DefaultValue("0") long offset,
             @Context DSLContext database
     ) {
         return locationDao.getCardsByLocation(lat, lng, database)
                 .stream()
                 .filter(p -> p.getActive() || includeArchived)
+                .skip(offset)
+                .limit(20)
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),

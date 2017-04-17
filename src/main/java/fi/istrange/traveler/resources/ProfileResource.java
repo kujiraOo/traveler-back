@@ -79,13 +79,16 @@ public class ProfileResource {
     @ApiOperation(value = "Produces list of personal travel cards created by user")
     public List<PersonalCardRes> getPersonalCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived
+            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
+            @QueryParam("offset") @DefaultValue("0") long offset
     ) {
         TravelerUser user = userDAO.fetchOneByUsername(principal.getName());
 
         return this.personalCardDao.fetchByUsernameFk(principal.getName())
                 .stream()
                 .filter(p -> p.getActive() || includeArchived)
+                .skip(offset)
+                .limit(20)
                 .map(p -> PersonalCardRes.fromEntity(p, user))
                 .collect(Collectors.toList());
     }
@@ -96,11 +99,14 @@ public class ProfileResource {
     public List<GroupCardRes> getGroupCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @Context DSLContext database,
-            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived
+            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
+            @QueryParam("offset") @DefaultValue("0") long offset
             ) {
         return groupCardDao.fetchByOwnerFk(principal.getName())
                 .stream()
                 .filter(p -> p.getActive() || includeArchived)
+                .skip(offset)
+                .limit(20)
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
