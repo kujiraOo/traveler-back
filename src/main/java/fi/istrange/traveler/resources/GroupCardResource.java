@@ -4,7 +4,7 @@ import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.api.GroupCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.GroupCardLocationDao;
+import fi.istrange.traveler.dao.GroupCardCustomDao;
 import fi.istrange.traveler.dao.GroupCardParticipantDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @PermitAll
 public class GroupCardResource {
     private final GroupCardDao cardDAO;
-    private final GroupCardLocationDao locationDao;
+    private final GroupCardCustomDao customGroupCardDao;
     private final TravelerUserDao userDAO;
     private final GroupCardParticipantDao participantDAO;
 
@@ -44,7 +44,7 @@ public class GroupCardResource {
         this.cardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.participantDAO = new GroupCardParticipantDao();
-        this.locationDao = new GroupCardLocationDao();
+        this.customGroupCardDao = new GroupCardCustomDao();
     }
 
     @GET
@@ -54,14 +54,11 @@ public class GroupCardResource {
             @NotNull @QueryParam("lat") BigDecimal lat,
             @NotNull @QueryParam("lng") BigDecimal lng,
             @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
-            @QueryParam("offset") @DefaultValue("0") long offset,
+            @QueryParam("offset") @DefaultValue("0") int offset,
             @Context DSLContext database
     ) {
-        return locationDao.getCardsByLocation(lat, lng, database)
+        return customGroupCardDao.fetchByPosition(lat, lng, includeArchived, offset, database)
                 .stream()
-                .filter(p -> p.getActive() || includeArchived)
-                .skip(offset)
-                .limit(20)
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),

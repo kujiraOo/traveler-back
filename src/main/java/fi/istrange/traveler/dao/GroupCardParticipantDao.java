@@ -14,12 +14,6 @@ import java.util.List;
  */
 public class GroupCardParticipantDao {
 
-    public GroupCardParticipantDao(
-
-    ) {
-
-    }
-
     public List<TravelerUser> getGroupCardParticipants(
             Long cardId,
             DSLContext database,

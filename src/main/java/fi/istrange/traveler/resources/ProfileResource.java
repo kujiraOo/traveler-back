@@ -5,7 +5,7 @@ import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.UserProfileRes;
 import fi.istrange.traveler.api.UserProfileUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.GroupCardParticipantDao;
+import fi.istrange.traveler.dao.*;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -38,6 +38,8 @@ public class ProfileResource {
     private final PersonalCardDao personalCardDao;
     private final GroupCardDao groupCardDao;
     private final GroupCardParticipantDao participantDao;
+    private final GroupCardCustomDao customGroupCardDao;
+    private final PersonalCardCustomDao customPersonalCardDao;
 
     @Inject
     public ProfileResource(
@@ -47,6 +49,8 @@ public class ProfileResource {
         personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         groupCardDao = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
+        customGroupCardDao = new GroupCardCustomDao();
+        customPersonalCardDao = new PersonalCardCustomDao();
     }
 
     @GET
@@ -80,15 +84,13 @@ public class ProfileResource {
     public List<PersonalCardRes> getPersonalCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
-            @QueryParam("offset") @DefaultValue("0") long offset
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @Context DSLContext database
     ) {
         TravelerUser user = userDAO.fetchOneByUsername(principal.getName());
 
-        return this.personalCardDao.fetchByUsernameFk(principal.getName())
+        return this.customPersonalCardDao.fetchByUsername(principal.getName(), includeArchived, offset, database)
                 .stream()
-                .filter(p -> p.getActive() || includeArchived)
-                .skip(offset)
-                .limit(20)
                 .map(p -> PersonalCardRes.fromEntity(p, user))
                 .collect(Collectors.toList());
     }
@@ -98,15 +100,12 @@ public class ProfileResource {
     @ApiOperation(value = "Produces list of group travel cards created by user")
     public List<GroupCardRes> getGroupCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @Context DSLContext database,
             @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
-            @QueryParam("offset") @DefaultValue("0") long offset
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @Context DSLContext database
             ) {
-        return groupCardDao.fetchByOwnerFk(principal.getName())
+        return customGroupCardDao.fetchByUsername(principal.getName(), includeArchived, offset, database)
                 .stream()
-                .filter(p -> p.getActive() || includeArchived)
-                .skip(offset)
-                .limit(20)
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
