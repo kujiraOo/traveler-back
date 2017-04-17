@@ -51,9 +51,12 @@ public class PersonalCardResource {
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @NotNull @QueryParam("lat") BigDecimal lat,
             @NotNull @QueryParam("lng") BigDecimal lng,
+            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
             @Context DSLContext database
             ) {
-        return locationDao.getCardsByLocation(lat, lng, database).stream()
+        return locationDao.getCardsByLocation(lat, lng, database)
+                .stream()
+                .filter(p -> p.getActive() || includeArchived)
                 .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .collect(Collectors.toList());
     }

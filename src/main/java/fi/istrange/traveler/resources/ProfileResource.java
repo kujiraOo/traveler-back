@@ -78,12 +78,15 @@ public class ProfileResource {
     @Path("/personal-cards")
     @ApiOperation(value = "Produces list of personal travel cards created by user")
     public List<PersonalCardRes> getPersonalCards(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived
     ) {
         TravelerUser user = userDAO.fetchOneByUsername(principal.getName());
 
         return this.personalCardDao.fetchByUsernameFk(principal.getName())
-                .stream().map(p -> PersonalCardRes.fromEntity(p, user))
+                .stream()
+                .filter(p -> p.getActive() || includeArchived)
+                .map(p -> PersonalCardRes.fromEntity(p, user))
                 .collect(Collectors.toList());
     }
 
@@ -92,10 +95,12 @@ public class ProfileResource {
     @ApiOperation(value = "Produces list of group travel cards created by user")
     public List<GroupCardRes> getGroupCards(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @Context DSLContext database
+            @Context DSLContext database,
+            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived
             ) {
         return groupCardDao.fetchByOwnerFk(principal.getName())
                 .stream()
+                .filter(p -> p.getActive() || includeArchived)
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
