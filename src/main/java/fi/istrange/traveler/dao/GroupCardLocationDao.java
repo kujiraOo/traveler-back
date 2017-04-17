@@ -19,7 +19,16 @@ public class GroupCardLocationDao {
         // TODO: change 1 to the value that atually makes sense
         return database.select()
                 .from(Tables.GROUP_CARD)
-                .where(Tables.GROUP_CARD.LAT.between(lat.subtract(new BigDecimal(1)), lat.add(new BigDecimal(1))))
+                .where(
+                    Tables.GROUP_CARD.LAT.between(
+                        lat.subtract(new BigDecimal(1)),
+                        lat.add(new BigDecimal(1))
+                    )
+                    .and(Tables.GROUP_CARD.LON.between(
+                        lat.subtract(new BigDecimal(1)),
+                        lat.add(new BigDecimal(1)))
+                    )
+                )
                 .fetch()
                 .map(p -> new GroupCard(
                         p.getValue(Tables.GROUP_CARD.ID),

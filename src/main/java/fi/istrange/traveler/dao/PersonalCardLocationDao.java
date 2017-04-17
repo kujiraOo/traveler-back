@@ -20,7 +20,16 @@ public class PersonalCardLocationDao {
         // TODO: change 1 to the value that atually makes sense
         return database.select()
                 .from(Tables.PERSONAL_CARD)
-                .where(Tables.PERSONAL_CARD.LAT.between(lat.subtract(new BigDecimal(1)), lat.add(new BigDecimal(1))))
+                .where(
+                    Tables.PERSONAL_CARD.LAT.between(
+                        lat.subtract(new BigDecimal(1)),
+                        lat.add(new BigDecimal(1))
+                    )
+                    .and(Tables.PERSONAL_CARD.LON.between(
+                            lat.subtract(new BigDecimal(1)),
+                            lat.add(new BigDecimal(1)))
+                    )
+                )
                 .fetch()
                 .map(p -> new PersonalCard(
                         p.getValue(Tables.PERSONAL_CARD.ID),

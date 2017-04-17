@@ -65,6 +65,7 @@ public class GroupCardResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation("Create a new group travel card")
     public GroupCardRes createGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             GroupCardCreationReq groupCardCreationReq,
@@ -79,6 +80,7 @@ public class GroupCardResource {
 
     @GET
     @Path("/{id}")
+    @ApiOperation("Get a specific group travel card by id")
     public GroupCardRes getGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long cardId,
@@ -94,6 +96,7 @@ public class GroupCardResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
+    @ApiOperation("Update a group travel card by id")
     public GroupCardRes updateGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long cardId,
@@ -108,16 +111,22 @@ public class GroupCardResource {
 
     @DELETE
     @Path("/{id}")
+    @ApiOperation("Archive a group travel card by id")
     public GroupCardRes deactivateGroupCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long cardId,
             @Context DSLContext database
     ) {
-        // TODO: change deletion logic to archival logic
-        cardDAO.deleteById(cardId);
-        participantDAO.deleteGroupCardParticipant(cardId, database);
+        GroupCard card = cardDAO.fetchOneById(cardId);
 
-        return getGroupCard(principal, cardId, database);
+        card.setActive(false);
+        cardDAO.update(card);
+
+        return GroupCardRes.fromEntity(
+                card,
+                participantDAO.getGroupCardParticipants(cardId, database, userDAO),
+                principal.getName()
+        );
     }
 
     private static GroupCard fromCreateReq(GroupCardCreationReq req, String username) {
