@@ -4,7 +4,7 @@ import fi.istrange.traveler.api.PersonalCardCreationReq;
 import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.api.PersonalCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.PersonalCardLocationDao;
+import fi.istrange.traveler.dao.PersonalCardCustomDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.PersonalCard;
@@ -35,14 +35,14 @@ import java.util.stream.Collectors;
 public class PersonalCardResource {
     private final PersonalCardDao cardDAO;
     private final TravelerUserDao userDAO;
-    private final PersonalCardLocationDao locationDao;
+    private final PersonalCardCustomDao customPersonalCardDao;
 
     public PersonalCardResource(
             ApplicationBundle applicationBundle
     ) {
         this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        this.locationDao = new PersonalCardLocationDao();
+        this.customPersonalCardDao = new PersonalCardCustomDao();
     }
 
     @GET
@@ -51,9 +51,12 @@ public class PersonalCardResource {
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @NotNull @QueryParam("lat") BigDecimal lat,
             @NotNull @QueryParam("lng") BigDecimal lng,
+            @QueryParam("includeArchived") @DefaultValue("false") boolean includeArchived,
+            @QueryParam("offset") @DefaultValue("0") int offset,
             @Context DSLContext database
             ) {
-        return locationDao.getCardsByLocation(lat, lng, database).stream()
+        return customPersonalCardDao.fetchByPosition(lat, lng, includeArchived, offset, database)
+                .stream()
                 .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .collect(Collectors.toList());
     }
