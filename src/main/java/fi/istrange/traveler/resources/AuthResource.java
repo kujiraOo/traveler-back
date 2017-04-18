@@ -24,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 public class AuthResource {
     private Authenticator auth;
 
-    public AuthResource(ApplicationBundle applicationBundle) {
+    public AuthResource() {
         auth = new Authenticator();
     }
 

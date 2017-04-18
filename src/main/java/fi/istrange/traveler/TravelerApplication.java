@@ -31,7 +31,7 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         applicationBundle.setConfiguration(configuration);
 
         environment.jersey().register(MultiPartFeature.class);
-        environment.jersey().register(new AuthResource(applicationBundle));
+        environment.jersey().register(new AuthResource());
         environment.jersey().register(new PersonalCardResource(applicationBundle));
         environment.jersey().register(new GroupCardResource(applicationBundle));
         environment.jersey().register(new UserResource(applicationBundle));
