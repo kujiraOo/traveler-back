@@ -10,8 +10,6 @@ import java.sql.Date;
  */
 public class UserProfileUpdateReq {
 
-    // TODO a placeholder to populate with appropriate values later
-
     private String firstName;
     private String lastName;
     private String email;

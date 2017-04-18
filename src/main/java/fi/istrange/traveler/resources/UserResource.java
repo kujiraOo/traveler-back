@@ -1,6 +1,7 @@
 package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserRegistrationReq;
+import fi.istrange.traveler.auth.PasswordHasher;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.UserCredentialDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -17,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by arsenii on 4/9/17.
@@ -44,7 +46,14 @@ public class UserResource {
             @Context DSLContext database
     ) {
         userDAO.insert(fromRegisterReq(newUser));
-        credentialDao.addUser(newUser.getUsername(), newUser.getPassword(), database);
+
+        String hashedPassword = newUser.getPassword();
+        try {
+            hashedPassword = PasswordHasher.hashPassword(newUser.getPassword());
+        } catch(NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        credentialDao.addUser(newUser.getUsername(), hashedPassword, database);
 
         return Response.accepted().build();
     }
