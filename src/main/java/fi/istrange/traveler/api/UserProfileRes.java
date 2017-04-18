@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 
 import java.util.Date;
+import java.util.List;
+
 /**
  * Created by arsenii on 4/9/17.
  */
@@ -18,7 +20,7 @@ public class UserProfileRes {
     private String address;
     private String city;
     private String country;
-
+    private List<Long> photos;
 
     @JsonCreator
     public UserProfileRes(
@@ -88,7 +90,12 @@ public class UserProfileRes {
         return country;
     }
 
-    public static UserProfileRes fromEntity (TravelerUser traveler) {
+    @JsonProperty
+    public List<Long> getPhotos() {
+        return photos;
+    }
+
+    public static UserProfileRes fromEntity(TravelerUser traveler) {
         return new UserProfileRes(
                 traveler.getUsername(),
                 traveler.getEmail(),

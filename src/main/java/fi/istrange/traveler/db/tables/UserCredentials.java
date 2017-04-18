@@ -7,12 +7,18 @@ package fi.istrange.traveler.db.tables;
 import fi.istrange.traveler.db.Keys;
 import fi.istrange.traveler.db.Public;
 import fi.istrange.traveler.db.tables.records.UserCredentialsRecord;
-import org.jooq.*;
-import org.jooq.impl.TableImpl;
 
-import javax.annotation.Generated;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Generated;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Schema;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.impl.TableImpl;
 
 
 /**
