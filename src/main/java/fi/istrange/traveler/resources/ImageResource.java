@@ -1,21 +1,12 @@
 package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.jooq.Configuration;
-import org.postgresql.largeobject.LargeObject;
-import org.postgresql.largeobject.LargeObjectManager;
+import fi.istrange.traveler.dao.ImageDao;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -26,33 +17,22 @@ import java.sql.SQLException;
 @PermitAll
 public class ImageResource {
 
-    private final Connection connection;
+    private final ImageDao imageDao;
 
     public ImageResource(ApplicationBundle applicationBundle) {
-        connection = applicationBundle.getJooqBundle().getConfiguration().connectionProvider().acquire();
+        imageDao = new ImageDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
     }
 
     @GET
     @Path("/{oid}")
     public Response getImage(@PathParam("oid") long oid) throws SQLException {
-        // All LargeObject API calls must be within a transaction block
-        connection.setAutoCommit(false);
 
-        try {
-            LargeObjectManager lobj = connection.unwrap(org.postgresql.PGConnection.class).getLargeObjectAPI();
-            LargeObject obj = lobj.open(oid, LargeObjectManager.READ);
-            byte buf[] = new byte[obj.size()];
-            obj.read(buf, 0, obj.size());
-            obj.close();
+        byte[] imageBuffer = imageDao.getImageBuffer(oid);
 
-            connection.commit();
-
-            return Response.ok(new ByteArrayInputStream(buf)).build();
-
-        } catch (Exception e) {
-            connection.rollback();
-
+        if (imageBuffer == null) {
             throw new NotFoundException();
         }
+
+        return Response.ok(new ByteArrayInputStream(imageBuffer)).build();
     }
 }
