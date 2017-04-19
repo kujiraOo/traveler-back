@@ -4,6 +4,7 @@ import fi.istrange.traveler.dao.CredentialDao;
 import fi.istrange.traveler.db.tables.pojos.UserCredentials;
 import org.jooq.DSLContext;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.WebApplicationException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
@@ -18,7 +19,11 @@ public class Authenticator {
         credentialDao = new CredentialDao();
     }
 
-    public boolean authenticate(String username, String password, DSLContext database) throws WebApplicationException {
+    public void authenticate(
+            String username,
+            String password,
+            DSLContext database
+    ) throws WebApplicationException {
         if (username == null || password == null) {
             throw new WebApplicationException(422);
         }
@@ -30,13 +35,19 @@ public class Authenticator {
             e.printStackTrace();
         }
 
+        Optional<UserCredentials> credentials = credentialDao.fetchByUsername(username, database);
 
-        Optional<UserCredentials> credentials= credentialDao.fetchByUsername(username, database);
+        if (!isCheckSuccessful(credentials, hashedPassword)) {
+            throw new NotAuthorizedException("Invalid credentials");
+        }
+    }
 
-        return (
-                credentials.isPresent() &&
-                        hashedPassword.equals(credentials.get().getPassword()) &&
-                        credentials.get().getActive()
-        );
+    private boolean isCheckSuccessful(
+            Optional<UserCredentials> credentials,
+            String hashedPassword
+    ) {
+        return credentials.isPresent() &&
+                hashedPassword.equals(credentials.get().getPassword()) &&
+                credentials.get().getActive();
     }
 }
