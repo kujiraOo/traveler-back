@@ -1,7 +1,6 @@
 package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserRegistrationReq;
-import fi.istrange.traveler.auth.PasswordHasher;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.UserCredentialDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -12,13 +11,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import org.jooq.DSLContext;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by arsenii on 4/9/17.
@@ -47,12 +46,8 @@ public class UserResource {
     ) {
         userDAO.insert(fromRegisterReq(newUser));
 
-        String hashedPassword = newUser.getPassword();
-        try {
-            hashedPassword = PasswordHasher.hashPassword(newUser.getPassword());
-        } catch(NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        String hashedPassword = BCrypt.hashpw(newUser.getPassword(), BCrypt.gensalt());
+
         credentialDao.addUser(newUser.getUsername(), hashedPassword, database);
 
         return Response.accepted().build();
