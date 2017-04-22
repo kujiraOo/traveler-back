@@ -3,10 +3,10 @@ package fi.istrange.traveler.auth;
 import fi.istrange.traveler.dao.CredentialDao;
 import fi.istrange.traveler.db.tables.pojos.UserCredentials;
 import org.jooq.DSLContext;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.WebApplicationException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 /**
@@ -28,26 +28,19 @@ public class Authenticator {
             throw new WebApplicationException(422);
         }
 
-        String hashedPassword = password;
-        try {
-            hashedPassword = PasswordHasher.hashPassword(password);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
         Optional<UserCredentials> credentials = credentialDao.fetchByUsername(username, database);
 
-        if (!isCheckSuccessful(credentials, hashedPassword)) {
+        if (!isCheckSuccessful(credentials, password)) {
             throw new NotAuthorizedException("Invalid credentials");
         }
     }
 
     private boolean isCheckSuccessful(
             Optional<UserCredentials> credentials,
-            String hashedPassword
+            String password
     ) {
         return credentials.isPresent() &&
-                hashedPassword.equals(credentials.get().getPassword()) &&
+                BCrypt.checkpw(password, credentials.get().getPassword()) &&
                 credentials.get().getActive();
     }
 }
