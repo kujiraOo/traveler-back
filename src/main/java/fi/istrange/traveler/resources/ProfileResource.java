@@ -1,9 +1,7 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.GroupCardRes;
-import fi.istrange.traveler.api.PersonalCardRes;
-import fi.istrange.traveler.api.UserProfileRes;
-import fi.istrange.traveler.api.UserProfileUpdateReq;
+import fi.istrange.traveler.api.*;
+import fi.istrange.traveler.auth.Authenticator;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.*;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -16,12 +14,14 @@ import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.jooq.DSLContext;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -36,17 +36,20 @@ import java.util.stream.Collectors;
 @Api(value = "/profile", tags = "profile")
 @PermitAll
 public class ProfileResource {
-
+    private final Authenticator auth;
     private final TravelerUserDao userDAO;
     private final UserPhotoDao userPhotoDao;
     private final GroupCardParticipantDao participantDao;
     private final GroupCardCustomDao customGroupCardDao;
     private final PersonalCardCustomDao customPersonalCardDao;
+    private final CredentialDao credentialDao;
 
     @Inject
     public ProfileResource(
             ApplicationBundle applicationBundle
     ) {
+        auth = new Authenticator();
+        credentialDao = new CredentialDao();
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
         customGroupCardDao = new GroupCardCustomDao();
@@ -79,6 +82,23 @@ public class ProfileResource {
         );
 
         return getUserProfile(principal);
+    }
+
+    @PUT
+    @Path("/password")
+    @ApiOperation("Change user's password")
+    public Response changePassword(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            PasswordChangeReq request,
+            @Context DSLContext database
+    ) {
+        auth.authenticate(principal.getName(), request.getOldPassword(), database);
+
+        String hashedPassword = BCrypt.hashpw(request.getNewPassword(), BCrypt.gensalt());
+;
+        credentialDao.updatePassword(principal.getName(), hashedPassword, database);
+
+        return Response.accepted().build();
     }
 
     @GET

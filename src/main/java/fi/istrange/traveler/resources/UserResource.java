@@ -2,7 +2,7 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserRegistrationReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.UserCredentialDao;
+import fi.istrange.traveler.dao.CredentialDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
@@ -27,14 +27,14 @@ import javax.ws.rs.core.Response;
 @Api(value = "/users", tags = "users")
 public class UserResource {
     private final TravelerUserDao userDAO;
-    private final UserCredentialDao credentialDao;
+    private final CredentialDao credentialDao;
 
     @Inject
     public UserResource(
             ApplicationBundle applicationBundle
     ) {
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        credentialDao = new UserCredentialDao();
+        credentialDao = new CredentialDao();
     }
 
     @POST
