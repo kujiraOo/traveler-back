@@ -23,4 +23,40 @@ public class CredentialDao {
                         p.get(Tables.USER_CREDENTIALS.ACTIVE)
                 )).stream().findFirst();
     }
+
+    public void addUser(
+            String username,
+            String password,
+            DSLContext database
+    ) {
+        database.insertInto(
+                Tables.USER_CREDENTIALS,
+                Tables.USER_CREDENTIALS.USERNAME,
+                Tables.USER_CREDENTIALS.PASSWORD,
+                Tables.USER_CREDENTIALS.ACTIVE
+        )
+                .values(username, password, true)
+                .execute();
+    }
+
+    public void deactivateUser(
+            String username,
+            DSLContext database
+    ) {
+        database.update(Tables.USER_CREDENTIALS)
+                .set(Tables.USER_CREDENTIALS.ACTIVE, false)
+                .where(Tables.USER_CREDENTIALS.USERNAME.equal(username))
+                .execute();
+    }
+
+    public void updatePassword(
+            String username,
+            String password,
+            DSLContext database
+    ) {
+        database.update(Tables.USER_CREDENTIALS)
+                .set(Tables.USER_CREDENTIALS.PASSWORD, password)
+                .where(Tables.USER_CREDENTIALS.USERNAME.equal(username))
+                .execute();
+    }
 }
