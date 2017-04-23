@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UserPhoto extends TableImpl<UserPhotoRecord> {
 
-    private static final long serialVersionUID = -1661944963;
+    private static final long serialVersionUID = -784454521;
 
     /**
      * The reference instance of <code>public.user_photo</code>
@@ -94,7 +94,7 @@ public class UserPhoto extends TableImpl<UserPhotoRecord> {
      */
     @Override
     public List<ForeignKey<UserPhotoRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<UserPhotoRecord, ?>>asList(Keys.USER_PHOTO__USER_CREDENTIALS_USERNAME_FKEY);
+        return Arrays.<ForeignKey<UserPhotoRecord, ?>>asList(Keys.USER_PHOTO__USER_PHOTO_USERNAME_FKEY);
     }
 
     /**
@@ -105,9 +105,6 @@ public class UserPhoto extends TableImpl<UserPhotoRecord> {
         return new UserPhoto(alias, this);
     }
 
-    /**
-     * Rename this table
-     */
     public UserPhoto rename(String name) {
         return new UserPhoto(name, null);
     }

@@ -1,28 +1,52 @@
 package fi.istrange.traveler.resources;
 
-import fi.istrange.traveler.api.MatchForCardRes;
-import fi.istrange.traveler.api.MatchResultRes;
+import fi.istrange.traveler.api.*;
+import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.CardDao;
+import fi.istrange.traveler.dao.MatchCustomDao;
+import fi.istrange.traveler.dao.PersonalCardCustomDao;
+import fi.istrange.traveler.db.Tables;
+import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
+import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
+import org.jooq.DSLContext;
 
+import javax.annotation.security.PermitAll;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by rohan on 4/22/17.
  */
-@Path("/match")
+@Path("/profile/cards/")
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "/match", tags = "match traveller cards")
+@Api(value = "/profile/cards/", tags = "match traveller cards")
+@PermitAll
 public class MatchResource {
 
+    private final PersonalCardDao cardDAO;
+    private final TravelerUserDao userDAO;
+    private final PersonalCardCustomDao customPersonalCardDao;
+
+    public MatchResource(
+            ApplicationBundle applicationBundle
+    ) {
+        this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
+        customPersonalCardDao = new PersonalCardCustomDao();
+    }
+
     /**
-     * Record a decision weather a card like other card.
+     * Record a like.
      * A valid request must provide:
      * <pre>
      *     + valid card ids referring to valid active cards
@@ -39,16 +63,46 @@ public class MatchResource {
      * @throws BadRequestException if given invalid request
      */
     @ApiOperation(value = "Record that one card like other card")
-    @PUT // side-effects of N > 0 identical requests is the same as for a single request
-    @Path("/{likerCardId}/{likedCardId}")
-    public MatchResultRes match(
+    @PUT
+    @Path("/{myCardId}/like/{cardId}")
+    public MatchResultRes like(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("likerCardId") @NotNull Long likerCardId,
-            @PathParam("likedCardId") @NotNull Long likedCardId,
-            @QueryParam("likeDecision") @NotNull Boolean likeDecision
+            @PathParam("myCardId") @NotNull Long myCardId,
+            @PathParam("cardId") @NotNull Long likedCardId,
+            @Context DSLContext db
     ) {
-        throw new UnsupportedOperationException("Unimplemented");
+        if (validate(principal.getName(), myCardId, likedCardId, db)) {
+            throw new BadRequestException("Dump request");
+        }
+
+        MatchCustomDao.createOrUpdateMatch(likedCardId, likedCardId, true, db);
+
+        return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }
+
+    /**
+     * Record a dislike
+     *
+     * @see MatchResource#
+     */
+    @ApiOperation(value = "Record that one card like other card")
+    @PUT // side-effects of N > 0 identical requests is the same as for a single request
+    @Path("/{myCardId}/dislike/{cardId}")
+    public MatchResultRes dislike(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("myCardId") @NotNull Long myCardId,
+            @PathParam("cardId") @NotNull Long likedCardId,
+            @Context DSLContext db
+    ) {
+        if (validate(principal.getName(), myCardId, likedCardId, db)) {
+            throw new BadRequestException("Dump request");
+        }
+
+        MatchCustomDao.createOrUpdateMatch(likedCardId, likedCardId, false, db);
+
+        return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
+    }
+
 
     /**
      * Get matching card for the card identified by the given id
@@ -66,25 +120,96 @@ public class MatchResource {
      */
     @ApiOperation(value = "Get the matched cards for given card")
     @GET
-    @Path("/{cardId}")
+    @Path("/matches/{myCardId}")
     public MatchForCardRes getMatching(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("cardId") @NotNull Long likerCardId
+            @PathParam("myCardId") @NotNull Long myCardId,
+            @Context DSLContext db
     ) {
-        throw new UnsupportedOperationException("Unimplemented");
+        if (!CardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
+            throw new BadRequestException();
+        }
+        Map<Boolean, List<Long>> matches = MatchCustomDao.getMatchingFor(myCardId, db)
+                .stream()
+                .collect(Collectors.partitioningBy(CardDao::isPersonalTravelCard));
+
+        List<PersonalCardRes> personalCardRess = createPersonalCardRes(matches.get(true), db);
+
+        List<GroupCardRes> groupCardRess = createGroupCardRes(matches.get(false), db);
+
+        return new MatchForCardRes(personalCardRess, groupCardRess);
     }
 
     /**
      * Check if two cards matched
+     * Valid request must have the Principal associated with myCardId
      */
     @ApiOperation(value = "Check if there is a match between two cards")
     @GET
-    @Path("/{likerCardId}/{likedCardId}")
+    @Path("/{myCarId}/{cardId}")
     public MatchResultRes isAMatch(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("likerCardId") @NotNull Long likerCardId,
-            @PathParam("likedCardId") @NotNull Long likedCardId
+            @PathParam("myCarId") @NotNull Long myCardId,
+            @PathParam("cardId") @NotNull Long likedCardId,
+            @Context DSLContext db
     ) {
-        throw new UnsupportedOperationException("Unimplemented");
+        if (!CardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
+            throw new BadRequestException();
+        }
+        return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
+    }
+
+    private List<PersonalCardRes> createPersonalCardRes(List<Long> personalCardIds, DSLContext db) {
+        return
+                db.selectFrom(Tables.PERSONAL_CARD)
+                        .where(Tables.PERSONAL_CARD.ID.in(personalCardIds))
+                        .fetch()
+                        .stream()
+                        .map(pcRecord ->
+                                new PersonalCardRes(
+                                        pcRecord.get(Tables.PERSONAL_CARD.ID),
+                                        pcRecord.get(Tables.PERSONAL_CARD.START_TIME),
+                                        pcRecord.get(Tables.PERSONAL_CARD.END_TIME),
+                                        pcRecord.get(Tables.PERSONAL_CARD.LON),
+                                        pcRecord.get(Tables.PERSONAL_CARD.LAT),
+                                        UserProfileRes.fromEntity(
+                                                userDAO.fetchOneByUsername(
+                                                        pcRecord.get(Tables.PERSONAL_CARD.USERNAME_FK)))
+                                )
+                        )
+                        .collect(Collectors.toList());
+    }
+
+    private List<GroupCardRes> createGroupCardRes(List<Long> groupCardIds, DSLContext db) {
+        return db.selectFrom(Tables.GROUP_CARD)
+                .where(Tables.GROUP_CARD.ID.in(groupCardIds))
+                .fetch()
+                .stream()
+                .map(record ->
+                        new GroupCardRes(
+                                record.get(Tables.GROUP_CARD.ID),
+                                record.get(Tables.GROUP_CARD.START_TIME),
+                                record.get(Tables.GROUP_CARD.END_TIME),
+                                record.get(Tables.GROUP_CARD.LON),
+                                record.get(Tables.GROUP_CARD.LAT),
+                                UserProfileRes.fromEntity(
+                                        userDAO.fetchOneByUsername(
+                                                record.get(Tables.GROUP_CARD.OWNER_FK))),
+                                db.select().
+                                        from(Tables.CARD_USER)
+                                        .where(Tables.CARD_USER.CARD_ID.equal(
+                                                record.get(Tables.GROUP_CARD.ID)
+                                        )).fetch(Tables.CARD_USER.USERNAME)
+                        )
+                ).collect(Collectors.toList());
+    }
+
+
+    private static boolean validate(String userName, Long likerCardId, Long likedCardId, DSLContext db) {
+        if (!CardDao.isActiveTravelCard(likerCardId, db)) return false;
+        if (!CardDao.isActiveTravelCard(likedCardId, db)) return false;
+        if (!CardDao.isUserAssociatedWithCard(userName, likerCardId, db)) return false;
+        if (CardDao.isUserAssociatedWithCard(userName, likedCardId, db)) return false;
+        return true;
     }
 }

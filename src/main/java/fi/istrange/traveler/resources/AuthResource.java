@@ -9,6 +9,7 @@ import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal
 import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookiePrincipal;
 import org.jooq.DSLContext;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -34,7 +35,7 @@ public class AuthResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public DefaultJwtCookiePrincipal login(
             @Context ContainerRequestContext requestContext,
-            @NotNull UserCredentialsView userCredentialsView,
+            @NotNull @Valid UserCredentialsView userCredentialsView,
             @Context DSLContext database
     ) {
         auth.authenticate(userCredentialsView.getName(), userCredentialsView.getPassword(), database);

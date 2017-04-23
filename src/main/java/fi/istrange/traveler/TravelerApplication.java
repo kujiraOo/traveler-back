@@ -37,6 +37,7 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         environment.jersey().register(new UserResource(applicationBundle));
         environment.jersey().register(new ProfileResource(applicationBundle));
         environment.jersey().register(new ImageResource(applicationBundle));
+        environment.jersey().register(new MatchResource(applicationBundle));
     }
 
     @Override
