@@ -4,7 +4,11 @@ import fi.istrange.traveler.api.*;
 import fi.istrange.traveler.auth.Authenticator;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.*;
+import fi.istrange.traveler.db.tables.daos.GroupCardDao;
+import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
+import fi.istrange.traveler.db.tables.pojos.GroupCard;
+import fi.istrange.traveler.db.tables.pojos.PersonalCard;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -43,6 +47,8 @@ public class ProfileResource {
     private final GroupCardCustomDao customGroupCardDao;
     private final PersonalCardCustomDao customPersonalCardDao;
     private final CredentialDao credentialDao;
+    private final PersonalCardDao personalCardDao;
+    private final GroupCardDao groupCardDao;
 
     @Inject
     public ProfileResource(
@@ -52,7 +58,9 @@ public class ProfileResource {
         credentialDao = new CredentialDao();
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
+        groupCardDao = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         customGroupCardDao = new GroupCardCustomDao();
+        personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         customPersonalCardDao = new PersonalCardCustomDao();
         userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
@@ -118,6 +126,43 @@ public class ProfileResource {
                 .collect(Collectors.toList());
     }
 
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("personal-cards/{id}")
+    @ApiOperation("Update a personal card")
+    public PersonalCardRes updatePersonalCard(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long personalCardId,
+            PersonalCardUpdateReq cardUpdateReq
+    ) {
+        this.personalCardDao.update(
+                fromUpdateReq(
+                        cardUpdateReq,
+                        personalCardDao.fetchOneById(personalCardId)
+                )
+        );
+
+        return PersonalCardRes.fromEntity(
+                this.personalCardDao.fetchOneById(personalCardId),
+                userDAO.fetchOneByUsername(principal.getName())
+        );
+    }
+
+    @DELETE
+    @Path("personal-cards/{id}")
+    @ApiOperation("Archive a personal card by id")
+    public PersonalCardRes deactivatePersonalCard(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long personalCardId
+    ) {
+        PersonalCard card = personalCardDao.fetchOneById(personalCardId);
+
+        card.setActive(false);
+        personalCardDao.update(card);
+
+        return PersonalCardRes.fromEntity(card, userDAO.fetchOneByUsername(principal.getName()));
+    }
+
     @GET
     @Path("/group-cards")
     @ApiOperation(value = "Produces list of group travel cards created by user")
@@ -137,9 +182,51 @@ public class ProfileResource {
                 .collect(Collectors.toList());
     }
 
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("group-cards/{id}")
+    @ApiOperation("Update a group travel card by id")
+    public GroupCardRes updateGroupCard(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long cardId,
+            GroupCardUpdateReq groupCardUpdateReq,
+            @Context DSLContext database
+    ) {
+        groupCardDao.update(fromUpdateReq(groupCardUpdateReq, groupCardDao.fetchOneById(cardId)));
+        participantDao.updateGroupCardParticipants(cardId, groupCardUpdateReq.getParticipants(), database);
+
+        return GroupCardRes.fromEntity(
+                groupCardDao.fetchOneById(cardId),
+                participantDao.getGroupCardParticipants(cardId, database, userDAO),
+                principal.getName()
+        );
+    }
+
+    @DELETE
+    @Path("group-cards/{id}")
+    @ApiOperation("Archive a group travel card by id")
+    public GroupCardRes deactivateGroupCard(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") long cardId,
+            @Context DSLContext database
+    ) {
+        GroupCard card = groupCardDao.fetchOneById(cardId);
+
+        card.setActive(false);
+        groupCardDao.update(card);
+
+        return GroupCardRes.fromEntity(
+                card,
+                participantDao.getGroupCardParticipants(cardId, database, userDAO),
+                principal.getName()
+        );
+    }
+
+
     @POST
     @Path("/photos")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation("Upload user photo")
     public UserProfileRes uploadPhoto(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @FormDataParam("file") InputStream uploadedPhotoStream,
@@ -161,5 +248,23 @@ public class ProfileResource {
         user.setGender(req.getGender());
 
         return user;
+    }
+
+    private static PersonalCard fromUpdateReq(PersonalCardUpdateReq req, PersonalCard card) {
+        card.setStartTime(req.getStartTime());
+        card.setEndTime(req.getEndTime());
+        card.setLon(req.getLon());
+        card.setLat(req.getLat());
+
+        return card;
+    }
+
+    private static GroupCard fromUpdateReq(GroupCardUpdateReq req, GroupCard card) {
+        card.setStartTime(req.getStartTime());
+        card.setEndTime(req.getEndTime());
+        card.setLon(req.getLon());
+        card.setLat(req.getLat());
+
+        return card;
     }
 }

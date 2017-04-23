@@ -2,6 +2,8 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.ImageDao;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
@@ -13,7 +15,8 @@ import java.sql.SQLException;
  * Created by arsenii on 4/17/17.
  */
 @Path("/images")
-@Produces("image/png")
+@Produces("image/jpg")
+@Api(value = "/images", tags = "images")
 @PermitAll
 public class ImageResource {
 
@@ -24,6 +27,7 @@ public class ImageResource {
     }
 
     @GET
+    @ApiOperation(value = "Responds with an image file")
     @Path("/{oid}")
     public Response getImage(@PathParam("oid") long oid) throws SQLException {
 
