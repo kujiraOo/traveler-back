@@ -2,11 +2,13 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.PersonalCardCreationReq;
 import fi.istrange.traveler.api.PersonalCardRes;
-import fi.istrange.traveler.api.PersonalCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.PersonalCardCustomDao;
+import fi.istrange.traveler.dao.CardType;
+import fi.istrange.traveler.dao.CustomCardDao;
+import fi.istrange.traveler.db.tables.daos.CardDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
+import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.PersonalCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -33,16 +35,18 @@ import java.util.stream.Collectors;
 @Api(value = "/personal-cards", tags = "personal cards")
 @PermitAll
 public class PersonalCardResource {
-    private final PersonalCardDao cardDAO;
+    private final CardDao cardDAO;
+    private final PersonalCardDao personalCardDao;
     private final TravelerUserDao userDAO;
-    private final PersonalCardCustomDao customPersonalCardDao;
+    private final CustomCardDao customPersonalCardDao;
 
     public PersonalCardResource(
             ApplicationBundle applicationBundle
     ) {
-        this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardDAO = new CardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        this.customPersonalCardDao = new PersonalCardCustomDao();
+        this.customPersonalCardDao = new CustomCardDao();
     }
 
     @GET
@@ -55,7 +59,7 @@ public class PersonalCardResource {
             @QueryParam("offset") @DefaultValue("0") int offset,
             @Context DSLContext database
             ) {
-        return customPersonalCardDao.fetchByPosition(lat, lng, includeArchived, offset, database)
+        return customPersonalCardDao.fetchByPosition(CardType.PERSONAL, lat, lng, includeArchived, offset, database)
                 .stream()
                 .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .collect(Collectors.toList());
@@ -69,6 +73,7 @@ public class PersonalCardResource {
             PersonalCardCreationReq personalCardCreationReq
     ) {
         this.cardDAO.insert(fromCreateReq(personalCardCreationReq, principal.getName()));
+        this.personalCardDao.insert(new PersonalCard(personalCardCreationReq.getId()));
 
         return PersonalCardRes.fromEntity(
                 this.cardDAO.fetchOneById(personalCardCreationReq.getId()),
@@ -83,16 +88,15 @@ public class PersonalCardResource {
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId
     ) {
-        return this.cardDAO.fetchByUsernameFk(principal.getName())
+        return this.cardDAO.fetchByOwnerFk(principal.getName())
                 .stream()
                 .filter(p -> p.getId() == personalCardId)
                 .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
                 .findFirst();
     }
 
-
-    private static PersonalCard fromCreateReq(PersonalCardCreationReq req, String username) {
-        return new PersonalCard(
+    private static Card fromCreateReq(PersonalCardCreationReq req, String username) {
+        return new Card(
                 req.getId(),
                 req.getStartTime(),
                 req.getEndTime(),

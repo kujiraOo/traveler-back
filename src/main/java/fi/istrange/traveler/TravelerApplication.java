@@ -2,6 +2,8 @@ package fi.istrange.traveler;
 
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.resources.*;
+import fi.istrange.traveler.resources.profile.MatchResource;
+import fi.istrange.traveler.resources.profile.ProfileResource;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;

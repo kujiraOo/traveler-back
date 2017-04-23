@@ -4,6 +4,7 @@
 package fi.istrange.traveler.db;
 
 
+import fi.istrange.traveler.db.tables.Card;
 import fi.istrange.traveler.db.tables.CardUser;
 import fi.istrange.traveler.db.tables.GroupCard;
 import fi.istrange.traveler.db.tables.Match;
@@ -27,6 +28,11 @@ import javax.annotation.Generated;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>public.card</code>.
+     */
+    public static final Card CARD = fi.istrange.traveler.db.tables.Card.CARD;
 
     /**
      * The table <code>public.card_user</code>.

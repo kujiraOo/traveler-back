@@ -1,12 +1,10 @@
-package fi.istrange.traveler.resources;
+package fi.istrange.traveler.resources.profile;
 
 import fi.istrange.traveler.api.*;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.CardDao;
+import fi.istrange.traveler.dao.CustomCardDao;
 import fi.istrange.traveler.dao.MatchCustomDao;
-import fi.istrange.traveler.dao.PersonalCardCustomDao;
 import fi.istrange.traveler.db.Tables;
-import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -32,17 +30,14 @@ import java.util.stream.Collectors;
 @Api(value = "/profile/cards/", tags = "match traveller cards")
 @PermitAll
 public class MatchResource {
-
-    private final PersonalCardDao cardDAO;
+    private final fi.istrange.traveler.db.tables.daos.CardDao cardDao;
     private final TravelerUserDao userDAO;
-    private final PersonalCardCustomDao customPersonalCardDao;
 
     public MatchResource(
             ApplicationBundle applicationBundle
     ) {
-        this.cardDAO = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardDao = new fi.istrange.traveler.db.tables.daos.CardDao();
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        customPersonalCardDao = new PersonalCardCustomDao();
     }
 
     /**
@@ -71,11 +66,11 @@ public class MatchResource {
             @PathParam("cardId") @NotNull Long likedCardId,
             @Context DSLContext db
     ) {
-        if (validate(principal.getName(), myCardId, likedCardId, db)) {
+        if (!validate(principal.getName(), myCardId, likedCardId, db)) {
             throw new BadRequestException("Dump request");
         }
 
-        MatchCustomDao.createOrUpdateMatch(likedCardId, likedCardId, true, db);
+        MatchCustomDao.createOrUpdateMatch(myCardId, likedCardId, true, db);
 
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }
@@ -94,11 +89,11 @@ public class MatchResource {
             @PathParam("cardId") @NotNull Long likedCardId,
             @Context DSLContext db
     ) {
-        if (validate(principal.getName(), myCardId, likedCardId, db)) {
+        if (!validate(principal.getName(), myCardId, likedCardId, db)) {
             throw new BadRequestException("Dump request");
         }
 
-        MatchCustomDao.createOrUpdateMatch(likedCardId, likedCardId, false, db);
+        MatchCustomDao.createOrUpdateMatch(myCardId, likedCardId, false, db);
 
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }
@@ -126,12 +121,12 @@ public class MatchResource {
             @PathParam("myCardId") @NotNull Long myCardId,
             @Context DSLContext db
     ) {
-        if (!CardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
+        if (!CustomCardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
             throw new BadRequestException();
         }
         Map<Boolean, List<Long>> matches = MatchCustomDao.getMatchingFor(myCardId, db)
                 .stream()
-                .collect(Collectors.partitioningBy(CardDao::isPersonalTravelCard));
+                .collect(Collectors.partitioningBy(CustomCardDao::isPersonalTravelCard));
 
         List<PersonalCardRes> personalCardRess = createPersonalCardRes(matches.get(true), db);
 
@@ -153,7 +148,7 @@ public class MatchResource {
             @PathParam("cardId") @NotNull Long likedCardId,
             @Context DSLContext db
     ) {
-        if (!CardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
+        if (!CustomCardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
             throw new BadRequestException();
         }
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
@@ -161,40 +156,40 @@ public class MatchResource {
 
     private List<PersonalCardRes> createPersonalCardRes(List<Long> personalCardIds, DSLContext db) {
         return
-                db.selectFrom(Tables.PERSONAL_CARD)
-                        .where(Tables.PERSONAL_CARD.ID.in(personalCardIds))
+                db.selectFrom(Tables.CARD)
+                        .where(Tables.CARD.ID.in(personalCardIds))
                         .fetch()
                         .stream()
                         .map(pcRecord ->
                                 new PersonalCardRes(
-                                        pcRecord.get(Tables.PERSONAL_CARD.ID),
-                                        pcRecord.get(Tables.PERSONAL_CARD.START_TIME),
-                                        pcRecord.get(Tables.PERSONAL_CARD.END_TIME),
-                                        pcRecord.get(Tables.PERSONAL_CARD.LON),
-                                        pcRecord.get(Tables.PERSONAL_CARD.LAT),
+                                        pcRecord.get(Tables.CARD.ID),
+                                        pcRecord.get(Tables.CARD.START_TIME),
+                                        pcRecord.get(Tables.CARD.END_TIME),
+                                        pcRecord.get(Tables.CARD.LON),
+                                        pcRecord.get(Tables.CARD.LAT),
                                         UserProfileRes.fromEntity(
                                                 userDAO.fetchOneByUsername(
-                                                        pcRecord.get(Tables.PERSONAL_CARD.USERNAME_FK)))
+                                                        pcRecord.get(Tables.CARD.OWNER_FK)))
                                 )
                         )
                         .collect(Collectors.toList());
     }
 
     private List<GroupCardRes> createGroupCardRes(List<Long> groupCardIds, DSLContext db) {
-        return db.selectFrom(Tables.GROUP_CARD)
-                .where(Tables.GROUP_CARD.ID.in(groupCardIds))
+        return db.selectFrom(Tables.CARD)
+                .where(Tables.CARD.ID.in(groupCardIds))
                 .fetch()
                 .stream()
                 .map(record ->
                         new GroupCardRes(
-                                record.get(Tables.GROUP_CARD.ID),
-                                record.get(Tables.GROUP_CARD.START_TIME),
-                                record.get(Tables.GROUP_CARD.END_TIME),
-                                record.get(Tables.GROUP_CARD.LON),
-                                record.get(Tables.GROUP_CARD.LAT),
+                                record.get(Tables.CARD.ID),
+                                record.get(Tables.CARD.START_TIME),
+                                record.get(Tables.CARD.END_TIME),
+                                record.get(Tables.CARD.LON),
+                                record.get(Tables.CARD.LAT),
                                 UserProfileRes.fromEntity(
                                         userDAO.fetchOneByUsername(
-                                                record.get(Tables.GROUP_CARD.OWNER_FK))),
+                                                record.get(Tables.CARD.OWNER_FK))),
                                 db.select().
                                         from(Tables.CARD_USER)
                                         .where(Tables.CARD_USER.CARD_ID.equal(
@@ -206,10 +201,10 @@ public class MatchResource {
 
 
     private static boolean validate(String userName, Long likerCardId, Long likedCardId, DSLContext db) {
-        if (!CardDao.isActiveTravelCard(likerCardId, db)) return false;
-        if (!CardDao.isActiveTravelCard(likedCardId, db)) return false;
-        if (!CardDao.isUserAssociatedWithCard(userName, likerCardId, db)) return false;
-        if (CardDao.isUserAssociatedWithCard(userName, likedCardId, db)) return false;
+        if (!CustomCardDao.isActiveTravelCard(likerCardId, db)) return false;
+        if (!CustomCardDao.isActiveTravelCard(likedCardId, db)) return false;
+        if (!CustomCardDao.isUserAssociatedWithCard(userName, likerCardId, db)) return false;
+        if (CustomCardDao.isUserAssociatedWithCard(userName, likedCardId, db)) return false;
         return true;
     }
 }
