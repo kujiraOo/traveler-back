@@ -7,8 +7,6 @@ package fi.istrange.traveler.db.tables.daos;
 import fi.istrange.traveler.db.tables.GroupCard;
 import fi.istrange.traveler.db.tables.records.GroupCardRecord;
 
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -64,47 +62,5 @@ public class GroupCardDao extends DAOImpl<GroupCardRecord, fi.istrange.traveler.
      */
     public fi.istrange.traveler.db.tables.pojos.GroupCard fetchOneById(Long value) {
         return fetchOne(GroupCard.GROUP_CARD.ID, value);
-    }
-
-    /**
-     * Fetch records that have <code>start_time IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.GroupCard> fetchByStartTime(Date... values) {
-        return fetch(GroupCard.GROUP_CARD.START_TIME, values);
-    }
-
-    /**
-     * Fetch records that have <code>end_time IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.GroupCard> fetchByEndTime(Date... values) {
-        return fetch(GroupCard.GROUP_CARD.END_TIME, values);
-    }
-
-    /**
-     * Fetch records that have <code>lon IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.GroupCard> fetchByLon(BigDecimal... values) {
-        return fetch(GroupCard.GROUP_CARD.LON, values);
-    }
-
-    /**
-     * Fetch records that have <code>lat IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.GroupCard> fetchByLat(BigDecimal... values) {
-        return fetch(GroupCard.GROUP_CARD.LAT, values);
-    }
-
-    /**
-     * Fetch records that have <code>owner_fk IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.GroupCard> fetchByOwnerFk(String... values) {
-        return fetch(GroupCard.GROUP_CARD.OWNER_FK, values);
-    }
-
-    /**
-     * Fetch records that have <code>active IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.GroupCard> fetchByActive(Boolean... values) {
-        return fetch(GroupCard.GROUP_CARD.ACTIVE, values);
     }
 }

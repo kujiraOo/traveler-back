@@ -2,7 +2,7 @@ package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fi.istrange.traveler.db.tables.pojos.PersonalCard;
+import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public class PersonalCardRes extends CardRes {
         super(id, startTime, endTime, lon, lat, owner);
     }
 
-    public static PersonalCardRes fromEntity(PersonalCard card, TravelerUser user) {
+    public static PersonalCardRes fromEntity(Card card, TravelerUser user) {
         return new PersonalCardRes(
                 card.getId(),
                 card.getStartTime(),

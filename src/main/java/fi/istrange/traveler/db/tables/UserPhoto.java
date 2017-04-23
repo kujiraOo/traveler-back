@@ -7,18 +7,12 @@ package fi.istrange.traveler.db.tables;
 import fi.istrange.traveler.db.Keys;
 import fi.istrange.traveler.db.Public;
 import fi.istrange.traveler.db.tables.records.UserPhotoRecord;
-
-import java.util.Arrays;
-import java.util.List;
+import org.jooq.*;
+import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Schema;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.impl.TableImpl;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -105,6 +99,9 @@ public class UserPhoto extends TableImpl<UserPhotoRecord> {
         return new UserPhoto(alias, this);
     }
 
+    /**
+     * Rename this table
+     */
     public UserPhoto rename(String name) {
         return new UserPhoto(name, null);
     }

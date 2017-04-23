@@ -1,14 +1,14 @@
-package fi.istrange.traveler.resources;
+package fi.istrange.traveler.resources.profile;
 
 import fi.istrange.traveler.api.*;
 import fi.istrange.traveler.auth.Authenticator;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.*;
+import fi.istrange.traveler.db.tables.daos.CardDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
-import fi.istrange.traveler.db.tables.pojos.GroupCard;
-import fi.istrange.traveler.db.tables.pojos.PersonalCard;
+import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -41,11 +41,11 @@ import java.util.stream.Collectors;
 @PermitAll
 public class ProfileResource {
     private final Authenticator auth;
+    private final fi.istrange.traveler.db.tables.daos.CardDao cardDao;
     private final TravelerUserDao userDAO;
     private final UserPhotoDao userPhotoDao;
     private final GroupCardParticipantDao participantDao;
-    private final GroupCardCustomDao customGroupCardDao;
-    private final PersonalCardCustomDao customPersonalCardDao;
+    private final CustomCardDao customPersonalCardDao;
     private final CredentialDao credentialDao;
     private final PersonalCardDao personalCardDao;
     private final GroupCardDao groupCardDao;
@@ -55,13 +55,13 @@ public class ProfileResource {
             ApplicationBundle applicationBundle
     ) {
         auth = new Authenticator();
+        cardDao = new CardDao(applicationBundle.getJooqBundle().getConfiguration());
         credentialDao = new CredentialDao();
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
         groupCardDao = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
-        customGroupCardDao = new GroupCardCustomDao();
         personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
-        customPersonalCardDao = new PersonalCardCustomDao();
+        customPersonalCardDao = new CustomCardDao();
         userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
@@ -120,7 +120,7 @@ public class ProfileResource {
     ) {
         TravelerUser user = userDAO.fetchOneByUsername(principal.getName());
 
-        return this.customPersonalCardDao.fetchByUsername(principal.getName(), includeArchived, offset, database)
+        return this.customPersonalCardDao.fetchByUsername(CardType.PERSONAL, principal.getName(), includeArchived, offset, database)
                 .stream()
                 .map(p -> PersonalCardRes.fromEntity(p, user))
                 .collect(Collectors.toList());
@@ -135,15 +135,15 @@ public class ProfileResource {
             @PathParam("id") long personalCardId,
             PersonalCardUpdateReq cardUpdateReq
     ) {
-        this.personalCardDao.update(
+        this.cardDao.update(
                 fromUpdateReq(
                         cardUpdateReq,
-                        personalCardDao.fetchOneById(personalCardId)
+                        cardDao.fetchOneById(personalCardId)
                 )
         );
 
         return PersonalCardRes.fromEntity(
-                this.personalCardDao.fetchOneById(personalCardId),
+                this.cardDao.fetchOneById(personalCardId),
                 userDAO.fetchOneByUsername(principal.getName())
         );
     }
@@ -155,10 +155,10 @@ public class ProfileResource {
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId
     ) {
-        PersonalCard card = personalCardDao.fetchOneById(personalCardId);
+        Card card = cardDao.fetchOneById(personalCardId);
 
         card.setActive(false);
-        personalCardDao.update(card);
+        cardDao.update(card);
 
         return PersonalCardRes.fromEntity(card, userDAO.fetchOneByUsername(principal.getName()));
     }
@@ -172,7 +172,8 @@ public class ProfileResource {
             @QueryParam("offset") @DefaultValue("0") int offset,
             @Context DSLContext database
             ) {
-        return customGroupCardDao.fetchByUsername(principal.getName(), includeArchived, offset, database)
+        return customPersonalCardDao
+                .fetchByUsername(CardType.GROUP, principal.getName(), includeArchived, offset, database)
                 .stream()
                 .map(p -> GroupCardRes.fromEntity(
                         p,
@@ -192,11 +193,11 @@ public class ProfileResource {
             GroupCardUpdateReq groupCardUpdateReq,
             @Context DSLContext database
     ) {
-        groupCardDao.update(fromUpdateReq(groupCardUpdateReq, groupCardDao.fetchOneById(cardId)));
+        cardDao.update(fromUpdateReq(groupCardUpdateReq, cardDao.fetchOneById(cardId)));
         participantDao.updateGroupCardParticipants(cardId, groupCardUpdateReq.getParticipants(), database);
 
         return GroupCardRes.fromEntity(
-                groupCardDao.fetchOneById(cardId),
+                cardDao.fetchOneById(cardId),
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
                 principal.getName()
         );
@@ -210,10 +211,10 @@ public class ProfileResource {
             @PathParam("id") long cardId,
             @Context DSLContext database
     ) {
-        GroupCard card = groupCardDao.fetchOneById(cardId);
+        Card card = cardDao.fetchOneById(cardId);
 
         card.setActive(false);
-        groupCardDao.update(card);
+        cardDao.update(card);
 
         return GroupCardRes.fromEntity(
                 card,
@@ -250,7 +251,7 @@ public class ProfileResource {
         return user;
     }
 
-    private static PersonalCard fromUpdateReq(PersonalCardUpdateReq req, PersonalCard card) {
+    private static Card fromUpdateReq(PersonalCardUpdateReq req, Card card) {
         card.setStartTime(req.getStartTime());
         card.setEndTime(req.getEndTime());
         card.setLon(req.getLon());
@@ -259,7 +260,7 @@ public class ProfileResource {
         return card;
     }
 
-    private static GroupCard fromUpdateReq(GroupCardUpdateReq req, GroupCard card) {
+    private static Card fromUpdateReq(GroupCardUpdateReq req, Card card) {
         card.setStartTime(req.getStartTime());
         card.setEndTime(req.getEndTime());
         card.setLon(req.getLon());

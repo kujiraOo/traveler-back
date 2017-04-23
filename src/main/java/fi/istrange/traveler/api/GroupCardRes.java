@@ -1,7 +1,7 @@
 package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fi.istrange.traveler.db.tables.pojos.GroupCard;
+import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 
 import java.math.BigDecimal;
@@ -35,7 +35,7 @@ public class GroupCardRes extends CardRes {
         return participants;
     }
 
-    public static GroupCardRes fromEntity(GroupCard card, List<TravelerUser> participants, String ownerUN) {
+    public static GroupCardRes fromEntity(Card card, List<TravelerUser> participants, String ownerUN) {
         Optional<TravelerUser> optionalOwner = participants.stream()
                 .filter(p -> p.getUsername() == ownerUN)
                 .findFirst();

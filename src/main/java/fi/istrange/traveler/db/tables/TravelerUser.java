@@ -159,6 +159,9 @@ public class TravelerUser extends TableImpl<TravelerUserRecord> {
         return new TravelerUser(alias, this);
     }
 
+    /**
+     * Rename this table
+     */
     public TravelerUser rename(String name) {
         return new TravelerUser(name, null);
     }

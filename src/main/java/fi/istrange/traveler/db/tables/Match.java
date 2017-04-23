@@ -7,18 +7,12 @@ package fi.istrange.traveler.db.tables;
 import fi.istrange.traveler.db.Keys;
 import fi.istrange.traveler.db.Public;
 import fi.istrange.traveler.db.tables.records.MatchRecord;
-
-import java.util.Arrays;
-import java.util.List;
+import org.jooq.*;
+import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
-
-import org.jooq.Field;
-import org.jooq.Schema;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.TableImpl;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -34,7 +28,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Match extends TableImpl<MatchRecord> {
 
-    private static final long serialVersionUID = -292978338;
+    private static final long serialVersionUID = -484841421;
 
     /**
      * The reference instance of <code>public.match</code>
@@ -114,10 +108,21 @@ public class Match extends TableImpl<MatchRecord> {
      * {@inheritDoc}
      */
     @Override
+    public List<ForeignKey<MatchRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<MatchRecord, ?>>asList(Keys.MATCH__MATCH_LIKER_ID_FKEY, Keys.MATCH__MATCH_LIKED_ID_FKEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Match as(String alias) {
         return new Match(alias, this);
     }
 
+    /**
+     * Rename this table
+     */
     public Match rename(String name) {
         return new Match(name, null);
     }

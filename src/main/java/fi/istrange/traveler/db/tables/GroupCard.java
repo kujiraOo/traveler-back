@@ -7,21 +7,12 @@ package fi.istrange.traveler.db.tables;
 import fi.istrange.traveler.db.Keys;
 import fi.istrange.traveler.db.Public;
 import fi.istrange.traveler.db.tables.records.GroupCardRecord;
-
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.Arrays;
-import java.util.List;
+import org.jooq.*;
+import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
-
-import org.jooq.Field;
-import org.jooq.Identity;
-import org.jooq.Schema;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.TableImpl;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -37,7 +28,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupCard extends TableImpl<GroupCardRecord> {
 
-    private static final long serialVersionUID = 705313234;
+    private static final long serialVersionUID = 1142174930;
 
     /**
      * The reference instance of <code>public.group_card</code>
@@ -55,37 +46,7 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
     /**
      * The column <code>public.group_card.id</code>.
      */
-    public final TableField<GroupCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('group_card_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
-
-    /**
-     * The column <code>public.group_card.start_time</code>.
-     */
-    public final TableField<GroupCardRecord, Date> START_TIME = createField("start_time", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "");
-
-    /**
-     * The column <code>public.group_card.end_time</code>.
-     */
-    public final TableField<GroupCardRecord, Date> END_TIME = createField("end_time", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "");
-
-    /**
-     * The column <code>public.group_card.lon</code>.
-     */
-    public final TableField<GroupCardRecord, BigDecimal> LON = createField("lon", org.jooq.impl.SQLDataType.NUMERIC.precision(10, 7), this, "");
-
-    /**
-     * The column <code>public.group_card.lat</code>.
-     */
-    public final TableField<GroupCardRecord, BigDecimal> LAT = createField("lat", org.jooq.impl.SQLDataType.NUMERIC.precision(10, 7), this, "");
-
-    /**
-     * The column <code>public.group_card.owner_fk</code>.
-     */
-    public final TableField<GroupCardRecord, String> OWNER_FK = createField("owner_fk", org.jooq.impl.SQLDataType.CHAR.length(80).nullable(false), this, "");
-
-    /**
-     * The column <code>public.group_card.active</code>.
-     */
-    public final TableField<GroupCardRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<GroupCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.group_card</code> table reference
@@ -121,14 +82,6 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
      * {@inheritDoc}
      */
     @Override
-    public Identity<GroupCardRecord, Long> getIdentity() {
-        return Keys.IDENTITY_GROUP_CARD;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public UniqueKey<GroupCardRecord> getPrimaryKey() {
         return Keys.GROUP_CARD_PKEY;
     }
@@ -145,10 +98,21 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
      * {@inheritDoc}
      */
     @Override
+    public List<ForeignKey<GroupCardRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<GroupCardRecord, ?>>asList(Keys.GROUP_CARD__GROUP_CARD_ID_FKEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public GroupCard as(String alias) {
         return new GroupCard(alias, this);
     }
 
+    /**
+     * Rename this table
+     */
     public GroupCard rename(String name) {
         return new GroupCard(name, null);
     }

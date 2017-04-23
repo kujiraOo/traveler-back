@@ -2,12 +2,14 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
-import fi.istrange.traveler.api.GroupCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.GroupCardCustomDao;
+import fi.istrange.traveler.dao.CardType;
+import fi.istrange.traveler.dao.CustomCardDao;
 import fi.istrange.traveler.dao.GroupCardParticipantDao;
+import fi.istrange.traveler.db.tables.daos.CardDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
+import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.GroupCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -33,18 +35,20 @@ import java.util.stream.Collectors;
 @Api(value = "/group-cards", tags = "group cards")
 @PermitAll
 public class GroupCardResource {
-    private final GroupCardDao cardDAO;
-    private final GroupCardCustomDao customGroupCardDao;
+    private final CardDao cardDAO;
+    private final GroupCardDao groupCardDAO;
+    private final CustomCardDao customGroupCardDao;
     private final TravelerUserDao userDAO;
     private final GroupCardParticipantDao participantDAO;
 
     public GroupCardResource(
             ApplicationBundle applicationBundle
     ) {
-        this.cardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardDAO = new CardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.groupCardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.participantDAO = new GroupCardParticipantDao();
-        this.customGroupCardDao = new GroupCardCustomDao();
+        this.customGroupCardDao = new CustomCardDao();
     }
 
     @GET
@@ -57,7 +61,7 @@ public class GroupCardResource {
             @QueryParam("offset") @DefaultValue("0") int offset,
             @Context DSLContext database
     ) {
-        return customGroupCardDao.fetchByPosition(lat, lng, includeArchived, offset, database)
+        return customGroupCardDao.fetchByPosition(CardType.GROUP, lat, lng, includeArchived, offset, database)
                 .stream()
                 .map(p -> GroupCardRes.fromEntity(
                         p,
@@ -75,6 +79,7 @@ public class GroupCardResource {
             @Context DSLContext database
     ) {
         cardDAO.insert(fromCreateReq(groupCardCreationReq, principal.getName()));
+        groupCardDAO.insert(new GroupCard(groupCardCreationReq.getId()));
         groupCardCreationReq.getParticipants()
                 .forEach(p -> participantDAO.addGroupCardParticipant(groupCardCreationReq.getId(), p, database));
 
@@ -96,8 +101,8 @@ public class GroupCardResource {
         );
     }
 
-    private static GroupCard fromCreateReq(GroupCardCreationReq req, String username) {
-        return new GroupCard(
+    private static Card fromCreateReq(GroupCardCreationReq req, String username) {
+        return new Card(
                 req.getId(),
                 req.getStartTime(),
                 req.getEndTime(),
