@@ -96,42 +96,6 @@ public class GroupCardResource {
         );
     }
 
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
-    @ApiOperation("Update a group travel card by id")
-    public GroupCardRes updateGroupCard(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long cardId,
-            GroupCardUpdateReq groupCardUpdateReq,
-            @Context DSLContext database
-    ) {
-        cardDAO.update(fromUpdateReq(groupCardUpdateReq, cardDAO.fetchOneById(cardId)));
-        participantDAO.updateGroupCardParticipants(cardId, groupCardUpdateReq.getParticipants(), database);
-
-        return getGroupCard(principal, cardId, database);
-    }
-
-    @DELETE
-    @Path("/{id}")
-    @ApiOperation("Archive a group travel card by id")
-    public GroupCardRes deactivateGroupCard(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long cardId,
-            @Context DSLContext database
-    ) {
-        GroupCard card = cardDAO.fetchOneById(cardId);
-
-        card.setActive(false);
-        cardDAO.update(card);
-
-        return GroupCardRes.fromEntity(
-                card,
-                participantDAO.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName()
-        );
-    }
-
     private static GroupCard fromCreateReq(GroupCardCreationReq req, String username) {
         return new GroupCard(
                 req.getId(),
@@ -142,14 +106,5 @@ public class GroupCardResource {
                 username,
                 true
         );
-    }
-
-    private static GroupCard fromUpdateReq(GroupCardUpdateReq req, GroupCard card) {
-        card.setStartTime(req.getStartTime());
-        card.setEndTime(req.getEndTime());
-        card.setLon(req.getLon());
-        card.setLat(req.getLat());
-
-        return card;
     }
 }

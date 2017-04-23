@@ -90,42 +90,6 @@ public class PersonalCardResource {
                 .findFirst();
     }
 
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
-    @ApiOperation("Update a personal card")
-    public PersonalCardRes updatePersonalCard(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId,
-            PersonalCardUpdateReq cardUpdateReq
-    ) {
-        this.cardDAO.update(
-                fromUpdateReq(
-                        cardUpdateReq,
-                        cardDAO.fetchOneById(personalCardId)
-                )
-        );
-
-        return PersonalCardRes.fromEntity(
-                this.cardDAO.fetchOneById(personalCardId),
-                userDAO.fetchOneByUsername(principal.getName())
-        );
-    }
-
-    @DELETE
-    @Path("/{id}")
-    @ApiOperation("Archive a personal card by id")
-    public PersonalCardRes deactivatePersonalCard(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId
-    ) {
-        PersonalCard card = cardDAO.fetchOneById(personalCardId);
-
-        card.setActive(false);
-        cardDAO.update(card);
-
-        return PersonalCardRes.fromEntity(card, userDAO.fetchOneByUsername(principal.getName()));
-    }
 
     private static PersonalCard fromCreateReq(PersonalCardCreationReq req, String username) {
         return new PersonalCard(
@@ -137,14 +101,5 @@ public class PersonalCardResource {
                 username,
                 true
         );
-    }
-
-    private static PersonalCard fromUpdateReq(PersonalCardUpdateReq req, PersonalCard card) {
-        card.setStartTime(req.getStartTime());
-        card.setEndTime(req.getEndTime());
-        card.setLon(req.getLon());
-        card.setLat(req.getLat());
-
-       return card;
     }
 }
