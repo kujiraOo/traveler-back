@@ -6,6 +6,7 @@ package fi.istrange.traveler.db;
 
 import fi.istrange.traveler.db.tables.CardUser;
 import fi.istrange.traveler.db.tables.GroupCard;
+import fi.istrange.traveler.db.tables.Match;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
@@ -18,6 +19,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Catalog;
+import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -35,7 +37,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1519723164;
+    private static final long serialVersionUID = 1355732710;
 
     /**
      * The reference instance of <code>public</code>
@@ -51,6 +53,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.group_card</code>.
      */
     public final GroupCard GROUP_CARD = fi.istrange.traveler.db.tables.GroupCard.GROUP_CARD;
+
+    /**
+     * The table <code>public.match</code>.
+     */
+    public final Match MATCH = fi.istrange.traveler.db.tables.Match.MATCH;
 
     /**
      * The table <code>public.personal_card</code>.
@@ -89,6 +96,19 @@ public class Public extends SchemaImpl {
     }
 
     @Override
+    public final List<Sequence<?>> getSequences() {
+        List result = new ArrayList();
+        result.addAll(getSequences0());
+        return result;
+    }
+
+    private final List<Sequence<?>> getSequences0() {
+        return Arrays.<Sequence<?>>asList(
+            Sequences.GROUP_CARD_ID_SEQ,
+            Sequences.PERSONAL_CARD_ID_SEQ);
+    }
+
+    @Override
     public final List<Table<?>> getTables() {
         List result = new ArrayList();
         result.addAll(getTables0());
@@ -99,6 +119,7 @@ public class Public extends SchemaImpl {
         return Arrays.<Table<?>>asList(
             CardUser.CARD_USER,
             GroupCard.GROUP_CARD,
+            Match.MATCH,
             PersonalCard.PERSONAL_CARD,
             TravelerUser.TRAVELER_USER,
             UserCredentials.USER_CREDENTIALS,

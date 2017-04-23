@@ -105,9 +105,6 @@ public class CardUser extends TableImpl<CardUserRecord> {
         return new CardUser(alias, this);
     }
 
-    /**
-     * Rename this table
-     */
     public CardUser rename(String name) {
         return new CardUser(name, null);
     }

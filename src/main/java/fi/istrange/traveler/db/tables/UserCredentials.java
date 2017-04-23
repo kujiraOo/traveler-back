@@ -110,9 +110,6 @@ public class UserCredentials extends TableImpl<UserCredentialsRecord> {
         return new UserCredentials(alias, this);
     }
 
-    /**
-     * Rename this table
-     */
     public UserCredentials rename(String name) {
         return new UserCredentials(name, null);
     }

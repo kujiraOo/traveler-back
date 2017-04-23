@@ -17,6 +17,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -37,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonalCard extends TableImpl<PersonalCardRecord> {
 
-    private static final long serialVersionUID = -297646061;
+    private static final long serialVersionUID = -1258910189;
 
     /**
      * The reference instance of <code>public.personal_card</code>
@@ -55,7 +56,7 @@ public class PersonalCard extends TableImpl<PersonalCardRecord> {
     /**
      * The column <code>public.personal_card.id</code>.
      */
-    public final TableField<PersonalCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<PersonalCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('personal_card_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>public.personal_card.start_time</code>.
@@ -121,6 +122,14 @@ public class PersonalCard extends TableImpl<PersonalCardRecord> {
      * {@inheritDoc}
      */
     @Override
+    public Identity<PersonalCardRecord, Long> getIdentity() {
+        return Keys.IDENTITY_PERSONAL_CARD;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UniqueKey<PersonalCardRecord> getPrimaryKey() {
         return Keys.PERSONAL_CARD_PKEY;
     }
@@ -149,9 +158,6 @@ public class PersonalCard extends TableImpl<PersonalCardRecord> {
         return new PersonalCard(alias, this);
     }
 
-    /**
-     * Rename this table
-     */
     public PersonalCard rename(String name) {
         return new PersonalCard(name, null);
     }

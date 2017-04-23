@@ -16,6 +16,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -36,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupCard extends TableImpl<GroupCardRecord> {
 
-    private static final long serialVersionUID = -778699277;
+    private static final long serialVersionUID = 705313234;
 
     /**
      * The reference instance of <code>public.group_card</code>
@@ -54,7 +55,7 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
     /**
      * The column <code>public.group_card.id</code>.
      */
-    public final TableField<GroupCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<GroupCardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('group_card_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>public.group_card.start_time</code>.
@@ -120,6 +121,14 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
      * {@inheritDoc}
      */
     @Override
+    public Identity<GroupCardRecord, Long> getIdentity() {
+        return Keys.IDENTITY_GROUP_CARD;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UniqueKey<GroupCardRecord> getPrimaryKey() {
         return Keys.GROUP_CARD_PKEY;
     }
@@ -140,9 +149,6 @@ public class GroupCard extends TableImpl<GroupCardRecord> {
         return new GroupCard(alias, this);
     }
 
-    /**
-     * Rename this table
-     */
     public GroupCard rename(String name) {
         return new GroupCard(name, null);
     }

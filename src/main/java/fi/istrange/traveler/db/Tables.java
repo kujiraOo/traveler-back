@@ -6,6 +6,7 @@ package fi.istrange.traveler.db;
 
 import fi.istrange.traveler.db.tables.CardUser;
 import fi.istrange.traveler.db.tables.GroupCard;
+import fi.istrange.traveler.db.tables.Match;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
@@ -36,6 +37,11 @@ public class Tables {
      * The table <code>public.group_card</code>.
      */
     public static final GroupCard GROUP_CARD = fi.istrange.traveler.db.tables.GroupCard.GROUP_CARD;
+
+    /**
+     * The table <code>public.match</code>.
+     */
+    public static final Match MATCH = fi.istrange.traveler.db.tables.Match.MATCH;
 
     /**
      * The table <code>public.personal_card</code>.
