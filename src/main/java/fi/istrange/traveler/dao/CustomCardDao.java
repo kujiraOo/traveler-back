@@ -14,21 +14,24 @@ import org.jooq.Table;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class host convenient method for travel card as a whole
  */
 public class CustomCardDao {
-    public static boolean isPersonalTravelCard(Long cardId) {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomCardDao.class);
+
+    public static boolean isPersonalTravelCard(Long cardId, DSLContext db) {
         Objects.requireNonNull(cardId);
-        // even
-        return cardId % 2 == 0;
+        return db.fetchExists(Tables.PERSONAL_CARD, Tables.PERSONAL_CARD.ID.equal(cardId));
     }
 
-    public static boolean isGroupTravelCard(Long cardId) {
+    public static boolean isGroupTravelCard(Long cardId, DSLContext db) {
         Objects.requireNonNull(cardId);
-        // odd
-        return cardId % 2 == 1;
+        return db.fetchExists(Tables.GROUP_CARD, Tables.GROUP_CARD.ID.equal(cardId));
     }
 
     /**
@@ -69,9 +72,9 @@ public class CustomCardDao {
                         .and(Tables.CARD.OWNER_FK.equal(userName))
         );
 
-        if (isPersonalTravelCard(cardId)) {
+        if (isPersonalTravelCard(cardId, db)) {
             return userAsCreator;
-        } else if (isGroupTravelCard(cardId)) {
+        } else if (isGroupTravelCard(cardId, db)) {
             if (userAsCreator) return true;
             final boolean userAsParticipant = db.fetchExists(
                     Tables.CARD_USER,

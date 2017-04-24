@@ -119,14 +119,14 @@ public class MatchResource {
     public MatchForCardRes getMatching(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("myCardId") @NotNull Long myCardId,
-            @Context DSLContext db
+            @Context final DSLContext db
     ) {
         if (!CustomCardDao.isUserAssociatedWithCard(principal.getName(), myCardId, db)) {
             throw new BadRequestException();
         }
         Map<Boolean, List<Long>> matches = MatchCustomDao.getMatchingFor(myCardId, db)
                 .stream()
-                .collect(Collectors.partitioningBy(CustomCardDao::isPersonalTravelCard));
+                .collect(Collectors.partitioningBy(p -> CustomCardDao.isPersonalTravelCard(p, db)));
 
         List<PersonalCardRes> personalCardRess = createPersonalCardRes(matches.get(true), db);
 
