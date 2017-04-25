@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * Created by rohan on 4/22/17.
  */
-@Path("/profile/cards/")
+@Path("/profile/cards")
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "/profile/cards/", tags = "match traveller cards")
 @PermitAll

@@ -18,13 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class host convenient method for travel card as a whole
+ * This class host convenient methods for travel card as a whole
  */
 public class CustomCardDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomCardDao.class);
 
     public static boolean isPersonalTravelCard(Long cardId, DSLContext db) {
+        // TODO expensive method, improve this for batch checking
         Objects.requireNonNull(cardId);
         return db.fetchExists(Tables.PERSONAL_CARD, Tables.PERSONAL_CARD.ID.equal(cardId));
     }
@@ -83,7 +84,8 @@ public class CustomCardDao {
             );
             return userAsParticipant;
         } else {
-            throw new RuntimeException("Should not be here");
+//            throw new RuntimeException("Should not be here");
+            return false;
         }
 
     }
