@@ -1,6 +1,8 @@
 package fi.istrange.traveler.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -60,5 +62,35 @@ public class CardRes {
     @JsonProperty
     public UserProfileRes getOwner() {
         return owner;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CardRes cardRes = (CardRes) o;
+        return Objects.equal(id, cardRes.id) &&
+                Objects.equal(startTime, cardRes.startTime) &&
+                Objects.equal(endTime, cardRes.endTime) &&
+                Objects.equal(lon, cardRes.lon) &&
+                Objects.equal(lat, cardRes.lat) &&
+                Objects.equal(owner, cardRes.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, startTime, endTime, lon, lat, owner);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("startTime", startTime)
+                .add("endTime", endTime)
+                .add("lon", lon)
+                .add("lat", lat)
+                .add("owner", owner)
+                .toString();
     }
 }
