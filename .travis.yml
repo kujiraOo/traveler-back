@@ -1,0 +1,22 @@
+sudo: required
+
+language: java
+
+services:
+  - docker
+
+before_install:
+  - pip install --user awscli
+  - aws ecs describe-task-definition --task-definition flask-signup | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/"$//' | sed 's/,$//'
+
+after_success:
+  - scripts/staging/docker_push.sh
+
+
+deploy:
+  # deploy develop to the staging environment
+  - provider: script
+    skip_cleanup: true
+    script: scripts/staging/deploy.sh
+    on:
+      branch: dev
