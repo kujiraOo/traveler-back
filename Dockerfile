@@ -1,7 +1,3 @@
-FROM library/postgres:9.5
-
-ADD init.sql /docker-entrypoint-initdb.d/
-
 FROM java:8
 
 # Install maven
@@ -27,4 +23,5 @@ RUN ["mvn", "package"]
 EXPOSE 4567
 
 RUN ls target
+  
 CMD ["/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-jar", "target/traveler-back-1.0-SNAPSHOT.jar", "server", "configuration.yml"]
