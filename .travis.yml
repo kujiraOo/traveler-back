@@ -8,6 +8,7 @@ services:
 before_install:
   - pip install --user awscli
   - aws ecs describe-task-definition --task-definition flask-signup | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/"$//' | sed 's/,$//'
+  - docker run --name traveler-db -e POSTGRES_DB=traveler -P -p 5032:5432 -d alekster/traveler-db
 
 after_success:
   - scripts/staging/docker_push.sh
