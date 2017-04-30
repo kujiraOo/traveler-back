@@ -3,6 +3,14 @@ SERVICE_NAME="flask-signup-service"
 IMAGE_VERSION="v_"${TRAVIS_BUILD_NUMBER}
 TASK_FAMILY="flask-signup"
 
+TASK_REVISION=`aws ecs describe-task-definition --task-definition flask-signup | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/"$//' | sed 's/,$//'`
+((OLD_TASK = TASK_REVISION - 0))
+aws ecs deregister-task-definition --task-definition ${TASK_FAMILY}:${OLD_TASK}
+
+OLD_TASK_ID=`aws ecs list-tasks --service-name=${SERVICE_NAME} | egrep "arn" | sed -e 's#.*task/\(\)#\1#' | sed 's/.$//'`
+echo ${OLD_TASK_ID}
+aws ecs stop-task --task ${OLD_TASK_ID}
+
 # Create a new task definition for this build
 sed -e "s;%BUILD_NUMBER%;${TRAVIS_BUILD_NUMBER};g" flask-signup.json > flask-signup-v_${TRAVIS_BUILD_NUMBER}.json
 ls
@@ -15,5 +23,6 @@ DESIRED_COUNT=`aws ecs describe-services --services ${SERVICE_NAME} | egrep "des
 if [ "$DESIRED_COUNT" = "0" ]; then
     DESIRED_COUNT="1"
 fi
+DESIRED_COUNT="1"
 
 aws ecs update-service --cluster default --service ${SERVICE_NAME} --task-definition ${TASK_FAMILY}:${TASK_REVISION} --desired-count ${DESIRED_COUNT}
