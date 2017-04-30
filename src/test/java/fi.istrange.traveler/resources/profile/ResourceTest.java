@@ -66,7 +66,7 @@ public class ResourceTest {
 
     private static final String userName = "postgres";
     private static final String password = "";
-    private static final String url = "jdbc:postgresql://127.0.0.1:5432/traveler";
+    private static final String url = "jdbc:postgresql://127.0.0.1:5032/traveler";
 
     private static Connection getDatabaseConnection() {
         try {
