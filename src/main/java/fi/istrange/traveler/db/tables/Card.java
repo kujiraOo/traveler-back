@@ -30,7 +30,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Card extends TableImpl<CardRecord> {
 
-    private static final long serialVersionUID = 1511124032;
+    private static final long serialVersionUID = -2035409179;
 
     /**
      * The reference instance of <code>public.card</code>
@@ -48,7 +48,7 @@ public class Card extends TableImpl<CardRecord> {
     /**
      * The column <code>public.card.id</code>.
      */
-    public final TableField<CardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<CardRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('card_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>public.card.start_time</code>.
@@ -81,6 +81,16 @@ public class Card extends TableImpl<CardRecord> {
     public final TableField<CardRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
+     * The column <code>public.card.title</code>.
+     */
+    public final TableField<CardRecord, String> TITLE = createField("title", org.jooq.impl.SQLDataType.VARCHAR.length(80), this, "");
+
+    /**
+     * The column <code>public.card.description</code>.
+     */
+    public final TableField<CardRecord, String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(700), this, "");
+
+    /**
      * Create a <code>public.card</code> table reference
      */
     public Card() {
@@ -108,6 +118,14 @@ public class Card extends TableImpl<CardRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<CardRecord, Long> getIdentity() {
+        return Keys.IDENTITY_CARD;
     }
 
     /**

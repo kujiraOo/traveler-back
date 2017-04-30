@@ -3,8 +3,10 @@ package fi.istrange.traveler.resources;
 import fi.istrange.traveler.api.PersonalCardCreationReq;
 import fi.istrange.traveler.api.PersonalCardRes;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.CardPhotoDao;
 import fi.istrange.traveler.dao.CardType;
 import fi.istrange.traveler.dao.CustomCardDao;
+import fi.istrange.traveler.dao.UserPhotoDao;
 import fi.istrange.traveler.db.tables.daos.CardDao;
 import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -39,6 +41,8 @@ public class PersonalCardResource {
     private final PersonalCardDao personalCardDao;
     private final TravelerUserDao userDAO;
     private final CustomCardDao customPersonalCardDao;
+    private final UserPhotoDao userPhotoDao;
+    private final CardPhotoDao cardPhotoDao;
 
     public PersonalCardResource(
             ApplicationBundle applicationBundle
@@ -47,6 +51,8 @@ public class PersonalCardResource {
         this.personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.customPersonalCardDao = new CustomCardDao();
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET
@@ -61,7 +67,12 @@ public class PersonalCardResource {
             ) {
         return customPersonalCardDao.fetchByPosition(CardType.PERSONAL, lat, lng, includeArchived, offset, database)
                 .stream()
-                .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
+                .map(p -> PersonalCardRes.fromEntity(
+                        p,
+                        userDAO.fetchOneByUsername(principal.getName()),
+                        userPhotoDao.fetchByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchById(p.getId(), database)
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -70,14 +81,17 @@ public class PersonalCardResource {
     @ApiOperation("Create new personal card")
     public PersonalCardRes createPersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            PersonalCardCreationReq personalCardCreationReq
+            PersonalCardCreationReq personalCardCreationReq,
+            @Context DSLContext database
     ) {
         this.cardDAO.insert(fromCreateReq(personalCardCreationReq, principal.getName()));
         this.personalCardDao.insert(new PersonalCard(personalCardCreationReq.getId()));
 
         return PersonalCardRes.fromEntity(
                 this.cardDAO.fetchOneById(personalCardCreationReq.getId()),
-                userDAO.fetchOneByUsername(principal.getName())
+                userDAO.fetchOneByUsername(principal.getName()),
+                userPhotoDao.fetchByUsername(principal.getName(), database),
+                cardPhotoDao.fetchById(personalCardCreationReq.getId(), database)
         );
     }
 
@@ -86,12 +100,18 @@ public class PersonalCardResource {
     @ApiOperation("Get a personal card by id")
     public Optional<PersonalCardRes> getPersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId
+            @PathParam("id") long personalCardId,
+            @Context DSLContext database
     ) {
         return this.cardDAO.fetchByOwnerFk(principal.getName())
                 .stream()
                 .filter(p -> p.getId() == personalCardId)
-                .map(p -> PersonalCardRes.fromEntity(p, userDAO.fetchOneByUsername(principal.getName())))
+                .map(p -> PersonalCardRes.fromEntity(
+                        p,
+                        userDAO.fetchOneByUsername(principal.getName()),
+                        userPhotoDao.fetchByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchById(personalCardId, database)
+                ))
                 .findFirst();
     }
 
@@ -103,7 +123,9 @@ public class PersonalCardResource {
                 req.getLon(),
                 req.getLat(),
                 username,
-                true
+                true,
+                req.getTitle(),
+                req.getDescription()
         );
     }
 }

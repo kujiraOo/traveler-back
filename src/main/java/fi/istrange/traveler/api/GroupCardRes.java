@@ -19,14 +19,17 @@ public class GroupCardRes extends CardRes {
 
     public GroupCardRes(
         Long id,
+        String title,
+        String description,
         Date startTime,
         Date endTime,
         BigDecimal lon,
         BigDecimal lat,
         UserProfileRes owner,
-        List<String> participants
+        List<String> participants,
+        List<Long> photos
     ) {
-        super(id, startTime, endTime, lon, lat, owner);
+        super(id, title, description, startTime, endTime, lon, lat, owner, photos);
         this.participants = participants;
     }
 
@@ -35,21 +38,30 @@ public class GroupCardRes extends CardRes {
         return participants;
     }
 
-    public static GroupCardRes fromEntity(Card card, List<TravelerUser> participants, String ownerUN) {
+    public static GroupCardRes fromEntity(
+            Card card,
+            List<TravelerUser> participants,
+            String ownerUN,
+            List<Long> userPhotos,
+            List<Long> cardPhotos
+    ) {
         Optional<TravelerUser> optionalOwner = participants.stream()
                 .filter(p -> p.getUsername() == ownerUN)
                 .findFirst();
 
         return new GroupCardRes(
                 card.getId(),
+                card.getTitle(),
+                card.getDescription(),
                 card.getStartTime(),
                 card.getEndTime(),
                 card.getLon(),
                 card.getLat(),
-                optionalOwner.isPresent() ? UserProfileRes.fromEntity(optionalOwner.get()) : null,
+                optionalOwner.isPresent() ? UserProfileRes.fromEntity(optionalOwner.get(), userPhotos) : null,
                 participants.stream()
                         .map(p -> p.getUsername())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                cardPhotos
         );
     }
 }

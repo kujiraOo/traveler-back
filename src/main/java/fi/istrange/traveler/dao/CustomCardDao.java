@@ -10,12 +10,12 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class host convenient methods for travel card as a whole
@@ -174,7 +174,9 @@ public class CustomCardDao {
                         p.getValue(Tables.CARD.LON),
                         p.getValue(Tables.CARD.LAT),
                         p.getValue(Tables.CARD.OWNER_FK),
-                        p.getValue(Tables.CARD.ACTIVE)
+                        p.getValue(Tables.CARD.ACTIVE),
+                        p.getValue(Tables.CARD.TITLE),
+                        p.getValue(Tables.CARD.DESCRIPTION)
                 ));
     }
 }

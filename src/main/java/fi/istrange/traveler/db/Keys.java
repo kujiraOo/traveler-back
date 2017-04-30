@@ -5,6 +5,7 @@ package fi.istrange.traveler.db;
 
 
 import fi.istrange.traveler.db.tables.Card;
+import fi.istrange.traveler.db.tables.CardPhoto;
 import fi.istrange.traveler.db.tables.CardUser;
 import fi.istrange.traveler.db.tables.GroupCard;
 import fi.istrange.traveler.db.tables.Match;
@@ -12,6 +13,7 @@ import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
 import fi.istrange.traveler.db.tables.UserPhoto;
+import fi.istrange.traveler.db.tables.records.CardPhotoRecord;
 import fi.istrange.traveler.db.tables.records.CardRecord;
 import fi.istrange.traveler.db.tables.records.CardUserRecord;
 import fi.istrange.traveler.db.tables.records.GroupCardRecord;
@@ -24,6 +26,7 @@ import fi.istrange.traveler.db.tables.records.UserPhotoRecord;
 import javax.annotation.Generated;
 
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
 
@@ -46,6 +49,7 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<CardRecord, Long> IDENTITY_CARD = Identities0.IDENTITY_CARD;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -62,6 +66,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final ForeignKey<CardRecord, TravelerUserRecord> CARD__CARD_OWNER_FK_FKEY = ForeignKeys0.CARD__CARD_OWNER_FK_FKEY;
+    public static final ForeignKey<CardPhotoRecord, CardRecord> CARD_PHOTO__CARD_PHOTO_FKEY = ForeignKeys0.CARD_PHOTO__CARD_PHOTO_FKEY;
     public static final ForeignKey<CardUserRecord, GroupCardRecord> CARD_USER__CARD_USER_CARD_ID_FKEY = ForeignKeys0.CARD_USER__CARD_USER_CARD_ID_FKEY;
     public static final ForeignKey<CardUserRecord, TravelerUserRecord> CARD_USER__CARD_USER_USERNAME_FKEY = ForeignKeys0.CARD_USER__CARD_USER_USERNAME_FKEY;
     public static final ForeignKey<GroupCardRecord, CardRecord> GROUP_CARD__GROUP_CARD_ID_FKEY = ForeignKeys0.GROUP_CARD__GROUP_CARD_ID_FKEY;
@@ -75,6 +80,10 @@ public class Keys {
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
+    private static class Identities0 extends AbstractKeys {
+        public static Identity<CardRecord, Long> IDENTITY_CARD = createIdentity(Card.CARD, Card.CARD.ID);
+    }
+
     private static class UniqueKeys0 extends AbstractKeys {
         public static final UniqueKey<CardRecord> CARD_PKEY = createUniqueKey(Card.CARD, "card_pkey", Card.CARD.ID);
         public static final UniqueKey<GroupCardRecord> GROUP_CARD_PKEY = createUniqueKey(GroupCard.GROUP_CARD, "group_card_pkey", GroupCard.GROUP_CARD.ID);
@@ -85,6 +94,7 @@ public class Keys {
 
     private static class ForeignKeys0 extends AbstractKeys {
         public static final ForeignKey<CardRecord, TravelerUserRecord> CARD__CARD_OWNER_FK_FKEY = createForeignKey(fi.istrange.traveler.db.Keys.TRAVELER_USER_PKEY, Card.CARD, "card__card_owner_fk_fkey", Card.CARD.OWNER_FK);
+        public static final ForeignKey<CardPhotoRecord, CardRecord> CARD_PHOTO__CARD_PHOTO_FKEY = createForeignKey(fi.istrange.traveler.db.Keys.CARD_PKEY, CardPhoto.CARD_PHOTO, "card_photo__card_photo_fkey", CardPhoto.CARD_PHOTO.CARD_ID);
         public static final ForeignKey<CardUserRecord, GroupCardRecord> CARD_USER__CARD_USER_CARD_ID_FKEY = createForeignKey(fi.istrange.traveler.db.Keys.GROUP_CARD_PKEY, CardUser.CARD_USER, "card_user__card_user_card_id_fkey", CardUser.CARD_USER.CARD_ID);
         public static final ForeignKey<CardUserRecord, TravelerUserRecord> CARD_USER__CARD_USER_USERNAME_FKEY = createForeignKey(fi.istrange.traveler.db.Keys.TRAVELER_USER_PKEY, CardUser.CARD_USER, "card_user__card_user_username_fkey", CardUser.CARD_USER.USERNAME);
         public static final ForeignKey<GroupCardRecord, CardRecord> GROUP_CARD__GROUP_CARD_ID_FKEY = createForeignKey(fi.istrange.traveler.db.Keys.CARD_PKEY, GroupCard.GROUP_CARD, "group_card__group_card_id_fkey", GroupCard.GROUP_CARD.ID);

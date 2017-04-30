@@ -4,15 +4,26 @@
 package fi.istrange.traveler.db;
 
 
-import fi.istrange.traveler.db.tables.*;
-import org.jooq.Catalog;
-import org.jooq.Table;
-import org.jooq.impl.SchemaImpl;
+import fi.istrange.traveler.db.tables.Card;
+import fi.istrange.traveler.db.tables.CardPhoto;
+import fi.istrange.traveler.db.tables.CardUser;
+import fi.istrange.traveler.db.tables.GroupCard;
+import fi.istrange.traveler.db.tables.Match;
+import fi.istrange.traveler.db.tables.PersonalCard;
+import fi.istrange.traveler.db.tables.TravelerUser;
+import fi.istrange.traveler.db.tables.UserCredentials;
+import fi.istrange.traveler.db.tables.UserPhoto;
 
-import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Generated;
+
+import org.jooq.Catalog;
+import org.jooq.Sequence;
+import org.jooq.Table;
+import org.jooq.impl.SchemaImpl;
 
 
 /**
@@ -28,7 +39,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1451704224;
+    private static final long serialVersionUID = -936160445;
 
     /**
      * The reference instance of <code>public</code>
@@ -39,6 +50,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.card</code>.
      */
     public final Card CARD = fi.istrange.traveler.db.tables.Card.CARD;
+
+    /**
+     * The table <code>public.card_photo</code>.
+     */
+    public final CardPhoto CARD_PHOTO = fi.istrange.traveler.db.tables.CardPhoto.CARD_PHOTO;
 
     /**
      * The table <code>public.card_user</code>.
@@ -92,6 +108,18 @@ public class Public extends SchemaImpl {
     }
 
     @Override
+    public final List<Sequence<?>> getSequences() {
+        List result = new ArrayList();
+        result.addAll(getSequences0());
+        return result;
+    }
+
+    private final List<Sequence<?>> getSequences0() {
+        return Arrays.<Sequence<?>>asList(
+            Sequences.CARD_ID_SEQ);
+    }
+
+    @Override
     public final List<Table<?>> getTables() {
         List result = new ArrayList();
         result.addAll(getTables0());
@@ -101,6 +129,7 @@ public class Public extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             Card.CARD,
+            CardPhoto.CARD_PHOTO,
             CardUser.CARD_USER,
             GroupCard.GROUP_CARD,
             Match.MATCH,

@@ -7,19 +7,13 @@ package fi.istrange.traveler.db.tables;
 import fi.istrange.traveler.db.Keys;
 import fi.istrange.traveler.db.Public;
 import fi.istrange.traveler.db.tables.records.TravelerUserRecord;
+import org.jooq.*;
+import org.jooq.impl.TableImpl;
 
+import javax.annotation.Generated;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.annotation.Generated;
-
-import org.jooq.Field;
-import org.jooq.Schema;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.TableImpl;
 
 
 /**
@@ -35,7 +29,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TravelerUser extends TableImpl<TravelerUserRecord> {
 
-    private static final long serialVersionUID = -1968376094;
+    private static final long serialVersionUID = 539079983;
 
     /**
      * The reference instance of <code>public.traveler_user</code>
@@ -89,11 +83,6 @@ public class TravelerUser extends TableImpl<TravelerUserRecord> {
      * The column <code>public.traveler_user.country</code>.
      */
     public final TableField<TravelerUserRecord, String> COUNTRY = createField("country", org.jooq.impl.SQLDataType.VARCHAR.length(80), this, "");
-
-    /**
-     * The column <code>public.traveler_user.photo</code>.
-     */
-    public final TableField<TravelerUserRecord, Long> PHOTO = createField("photo", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.traveler_user.first_name</code>.

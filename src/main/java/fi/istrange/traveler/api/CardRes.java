@@ -6,38 +6,54 @@ import com.google.common.base.Objects;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
 /**
  * Created by aleksandr on 11.4.2017.
  */
 public class CardRes {
     private Long id;
+    private String title;
+    private String description;
     private Date startTime;
     private Date endTime;
     private BigDecimal lon;
     private BigDecimal lat;
     private UserProfileRes owner;
+    private List<Long> photos;
 
     public CardRes(
         Long id,
+        String title,
+        String description,
         Date startTime,
         Date endTime,
         BigDecimal lon,
         BigDecimal lat,
-        UserProfileRes owner
+        UserProfileRes owner,
+        List<Long> photos
     ) {
         this.id = id;
+        this.title = title;
+        this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
         this.lon = lon;
         this.lat = lat;
         this.owner = owner;
+        this.photos = photos;
     }
 
     @JsonProperty
     public Long getID() {
         return id;
     }
+
+    @JsonProperty
+    public String getTitle() { return this.title; }
+
+    @JsonProperty
+    public String getDescription() { return this.description; }
 
     @JsonProperty
     public Date getStartTime() {
@@ -63,6 +79,9 @@ public class CardRes {
     public UserProfileRes getOwner() {
         return owner;
     }
+
+    @JsonProperty
+    public List<Long> getPhotos() { return photos; }
 
     @Override
     public boolean equals(Object o) {

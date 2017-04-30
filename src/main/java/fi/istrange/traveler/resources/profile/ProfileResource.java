@@ -44,6 +44,7 @@ public class ProfileResource {
     private final fi.istrange.traveler.db.tables.daos.CardDao cardDao;
     private final TravelerUserDao userDAO;
     private final UserPhotoDao userPhotoDao;
+    private final CardPhotoDao cardPhotoDao;
     private final GroupCardParticipantDao participantDao;
     private final CustomCardDao customPersonalCardDao;
     private final CredentialDao credentialDao;
@@ -63,15 +64,18 @@ public class ProfileResource {
         personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         customPersonalCardDao = new CustomCardDao();
         userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET
     @ApiOperation("Get user profile information")
     public UserProfileRes getUserProfile(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @Context DSLContext database
     ) {
         return UserProfileRes.fromEntity(
-                this.userDAO.fetchOneByUsername(principal.getName())
+                this.userDAO.fetchOneByUsername(principal.getName()),
+                userPhotoDao.fetchByUsername(principal.getName(), database)
         );
     }
 
@@ -80,7 +84,8 @@ public class ProfileResource {
     @ApiOperation("Update user profile information")
     public UserProfileRes updateUserProfile(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            UserProfileUpdateReq userProfileUpdateReq
+            UserProfileUpdateReq userProfileUpdateReq,
+            @Context DSLContext database
     ) {
         this.userDAO.update(
                 fromUpdateReq(
@@ -89,7 +94,7 @@ public class ProfileResource {
                 )
         );
 
-        return getUserProfile(principal);
+        return getUserProfile(principal, database);
     }
 
     @PUT
@@ -122,7 +127,12 @@ public class ProfileResource {
 
         return this.customPersonalCardDao.fetchByUsername(CardType.PERSONAL, principal.getName(), includeArchived, offset, database)
                 .stream()
-                .map(p -> PersonalCardRes.fromEntity(p, user))
+                .map(p -> PersonalCardRes.fromEntity(
+                        p,
+                        user,
+                        userPhotoDao.fetchByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchById(p.getId(), database)
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -133,7 +143,8 @@ public class ProfileResource {
     public PersonalCardRes updatePersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @PathParam("id") long personalCardId,
-            PersonalCardUpdateReq cardUpdateReq
+            PersonalCardUpdateReq cardUpdateReq,
+            @Context DSLContext database
     ) {
         this.cardDao.update(
                 fromUpdateReq(
@@ -144,7 +155,9 @@ public class ProfileResource {
 
         return PersonalCardRes.fromEntity(
                 this.cardDao.fetchOneById(personalCardId),
-                userDAO.fetchOneByUsername(principal.getName())
+                userDAO.fetchOneByUsername(principal.getName()),
+                userPhotoDao.fetchByUsername(principal.getName(), database),
+                cardPhotoDao.fetchById(personalCardId, database)
         );
     }
 
@@ -153,14 +166,35 @@ public class ProfileResource {
     @ApiOperation("Archive a personal card by id")
     public PersonalCardRes deactivatePersonalCard(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long personalCardId
+            @PathParam("id") long personalCardId,
+            @Context DSLContext database
     ) {
         Card card = cardDao.fetchOneById(personalCardId);
 
         card.setActive(false);
         cardDao.update(card);
 
-        return PersonalCardRes.fromEntity(card, userDAO.fetchOneByUsername(principal.getName()));
+        return PersonalCardRes.fromEntity(
+                card,
+                userDAO.fetchOneByUsername(principal.getName()),
+                userPhotoDao.fetchByUsername(principal.getName(), database),
+                cardPhotoDao.fetchById(personalCardId, database)
+        );
+    }
+
+    @POST
+    @Path("cards/{id}/photos")
+    @ApiOperation("Upload a photo for a card")
+    public Response uploadPersonalCardPhoto(
+            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
+            @PathParam("id") Long cardId,
+            @FormDataParam("file") InputStream uploadedPhotoStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail,
+            @Context DSLContext database
+    ) throws IOException, SQLException {
+        cardPhotoDao.addPhoto(cardId, uploadedPhotoStream);
+
+        return Response.accepted().build();
     }
 
     @GET
@@ -178,8 +212,10 @@ public class ProfileResource {
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
-                        principal.getName())
-                )
+                        principal.getName(),
+                        userPhotoDao.fetchByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchById(p.getId(), database)
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +235,9 @@ public class ProfileResource {
         return GroupCardRes.fromEntity(
                 cardDao.fetchOneById(cardId),
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName()
+                principal.getName(),
+                userPhotoDao.fetchByUsername(principal.getName(), database),
+                cardPhotoDao.fetchById(cardId, database)
         );
     }
 
@@ -219,10 +257,11 @@ public class ProfileResource {
         return GroupCardRes.fromEntity(
                 card,
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName()
+                principal.getName(),
+                userPhotoDao.fetchByUsername(principal.getName(), database),
+                cardPhotoDao.fetchById(cardId, database)
         );
     }
-
 
     @POST
     @Path("/photos")
@@ -231,11 +270,12 @@ public class ProfileResource {
     public UserProfileRes uploadPhoto(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
             @FormDataParam("file") InputStream uploadedPhotoStream,
-            @FormDataParam("file") FormDataContentDisposition fileDetail
+            @FormDataParam("file") FormDataContentDisposition fileDetail,
+            @Context DSLContext database
     ) throws IOException, SQLException {
 
         userPhotoDao.addPhoto(principal.getName(), uploadedPhotoStream);
-        return getUserProfile(principal);
+        return getUserProfile(principal, database);
     }
 
 

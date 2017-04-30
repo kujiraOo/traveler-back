@@ -4,11 +4,10 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
-
-import javax.annotation.Generated;
 
 
 /**
@@ -24,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Card implements Serializable {
 
-    private static final long serialVersionUID = -185307820;
+    private static final long serialVersionUID = -843353006;
 
     private Long       id;
     private Date       startTime;
@@ -33,6 +32,8 @@ public class Card implements Serializable {
     private BigDecimal lat;
     private String     ownerFk;
     private Boolean    active;
+    private String     title;
+    private String     description;
 
     public Card() {}
 
@@ -44,6 +45,8 @@ public class Card implements Serializable {
         this.lat = value.lat;
         this.ownerFk = value.ownerFk;
         this.active = value.active;
+        this.title = value.title;
+        this.description = value.description;
     }
 
     public Card(
@@ -53,7 +56,9 @@ public class Card implements Serializable {
         BigDecimal lon,
         BigDecimal lat,
         String     ownerFk,
-        Boolean    active
+        Boolean    active,
+        String     title,
+        String     description
     ) {
         this.id = id;
         this.startTime = startTime;
@@ -62,6 +67,8 @@ public class Card implements Serializable {
         this.lat = lat;
         this.ownerFk = ownerFk;
         this.active = active;
+        this.title = title;
+        this.description = description;
     }
 
     public Long getId() {
@@ -120,6 +127,22 @@ public class Card implements Serializable {
         this.active = active;
     }
 
+    public String getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Card (");
@@ -131,6 +154,8 @@ public class Card implements Serializable {
         sb.append(", ").append(lat);
         sb.append(", ").append(ownerFk);
         sb.append(", ").append(active);
+        sb.append(", ").append(title);
+        sb.append(", ").append(description);
 
         sb.append(")");
         return sb.toString();
