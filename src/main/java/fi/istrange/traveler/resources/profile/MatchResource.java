@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * Created by rohan on 4/22/17.
  */
-@Path("/profile/cards/")
+@Path("/profile/cards")
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "/profile/cards/", tags = "match traveller cards")
 @PermitAll
@@ -45,8 +45,8 @@ public class MatchResource {
      * A valid request must provide:
      * <pre>
      *     + valid card ids referring to valid active cards
-     *     + two cards must have a shared active period
-     *     + two cards must have a certain closeness in location?
+     *     + two cards must have a shared active period !!
+     *     + two cards must have a certain closeness in location? !!
      *     + liker card id must be associated with the Principal making the request
      *     + liked card id must not be associated with the Principal making the request
      *     A principal is said to be associated with a card when either he is the owner

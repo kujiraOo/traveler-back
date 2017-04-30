@@ -16,7 +16,7 @@ public class MatchResultRes {
     }
 
     @JsonProperty("matched")
-    public Boolean getAMatch() {
+    public Boolean isAMatch() {
         return matched;
     }
 }
