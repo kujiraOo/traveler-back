@@ -5,9 +5,9 @@ server:
 
   applicationConnectors:
       - type: http
-        port: 8080
-      - type: https
         port: 5000
+      - type: https
+        port: 8080
         keyStorePath: example.keystore
         keyStorePassword: example
 
@@ -34,7 +34,7 @@ database:
   driverClass: org.postgresql.Driver
   user: postgres
   password:
-  url: jdbc:postgresql://127.0.0.1:5432/traveler
+  url: jdbc:postgresql://${CUSTOM_ALIAS_PORT_5432_TCP_ADDR}:5432/traveler
 
 jooq:
   # The flavor of SQL to generate. If not specified, it will be inferred from the JDBC connection URL.  (default: null)
