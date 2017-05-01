@@ -2,8 +2,10 @@ package fi.istrange.traveler.resources.profile;
 
 import fi.istrange.traveler.api.*;
 import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.dao.CardPhotoDao;
 import fi.istrange.traveler.dao.CustomCardDao;
 import fi.istrange.traveler.dao.MatchCustomDao;
+import fi.istrange.traveler.dao.UserPhotoDao;
 import fi.istrange.traveler.db.Tables;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import io.dropwizard.auth.Auth;
@@ -32,12 +34,16 @@ import java.util.stream.Collectors;
 public class MatchResource {
     private final fi.istrange.traveler.db.tables.daos.CardDao cardDao;
     private final TravelerUserDao userDAO;
+    private final UserPhotoDao userPhotoDao;
+    private final CardPhotoDao cardPhotoDao;
 
     public MatchResource(
             ApplicationBundle applicationBundle
     ) {
         this.cardDao = new fi.istrange.traveler.db.tables.daos.CardDao();
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     /**
@@ -163,13 +169,19 @@ public class MatchResource {
                         .map(pcRecord ->
                                 new PersonalCardRes(
                                         pcRecord.get(Tables.CARD.ID),
+                                        pcRecord.get(Tables.CARD.TITLE),
+                                        pcRecord.get(Tables.CARD.DESCRIPTION),
                                         pcRecord.get(Tables.CARD.START_TIME),
                                         pcRecord.get(Tables.CARD.END_TIME),
                                         pcRecord.get(Tables.CARD.LON),
                                         pcRecord.get(Tables.CARD.LAT),
                                         UserProfileRes.fromEntity(
                                                 userDAO.fetchOneByUsername(
-                                                        pcRecord.get(Tables.CARD.OWNER_FK)))
+                                                        pcRecord.get(Tables.CARD.OWNER_FK)
+                                                ),
+                                                userPhotoDao.fetchByUsername(pcRecord.get(Tables.CARD.OWNER_FK), db)
+                                        ),
+                                        cardPhotoDao.fetchById(pcRecord.get(Tables.CARD.ID), db)
                                 )
                         )
                         .collect(Collectors.toList());
@@ -183,18 +195,24 @@ public class MatchResource {
                 .map(record ->
                         new GroupCardRes(
                                 record.get(Tables.CARD.ID),
+                                record.get(Tables.CARD.TITLE),
+                                record.get(Tables.CARD.DESCRIPTION),
                                 record.get(Tables.CARD.START_TIME),
                                 record.get(Tables.CARD.END_TIME),
                                 record.get(Tables.CARD.LON),
                                 record.get(Tables.CARD.LAT),
                                 UserProfileRes.fromEntity(
                                         userDAO.fetchOneByUsername(
-                                                record.get(Tables.CARD.OWNER_FK))),
+                                                record.get(Tables.CARD.OWNER_FK)
+                                        ),
+                                        userPhotoDao.fetchByUsername(record.get(Tables.CARD.OWNER_FK), db)
+                                ),
                                 db.select().
                                         from(Tables.CARD_USER)
                                         .where(Tables.CARD_USER.CARD_ID.equal(
                                                 record.get(Tables.GROUP_CARD.ID)
-                                        )).fetch(Tables.CARD_USER.USERNAME)
+                                        )).fetch(Tables.CARD_USER.USERNAME),
+                                cardPhotoDao.fetchById(record.get(Tables.CARD.ID), db)
                         )
                 ).collect(Collectors.toList());
     }

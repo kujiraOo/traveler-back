@@ -15,16 +15,22 @@ public class CardCreationReq {
     private Date endTime;
     private BigDecimal lon;
     private BigDecimal lat;
+    private String title;
+    private String description;
 
     @JsonCreator
     public CardCreationReq(
             @JsonProperty("id") Long id,
+            @JsonProperty("title") String title,
+            @JsonProperty("description") String description,
             @JsonProperty("startTime") Date startTime,
             @JsonProperty("endTime") Date endTime,
             @JsonProperty("lon") BigDecimal lon,
             @JsonProperty("lat") BigDecimal lat
     ) {
         this.id = id;
+        this.title = title;
+        this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
         this.lon = lon;
@@ -34,6 +40,10 @@ public class CardCreationReq {
     public Long getId() {
         return id;
     }
+
+    public String getTitle() { return title; }
+
+    public String getDescription() { return description; }
 
     public Date getStartTime() {
         return startTime;

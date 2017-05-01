@@ -32,7 +32,8 @@ public class UserProfileRes {
             String phone,
             String address,
             String city,
-            String country
+            String country,
+            List<Long> photos
     ) {
         this.username = username;
         this.email = email;
@@ -43,6 +44,7 @@ public class UserProfileRes {
         this.address = address;
         this.city = city;
         this.country = country;
+        this.photos = photos;
     }
 
     @JsonProperty
@@ -95,7 +97,7 @@ public class UserProfileRes {
         return photos;
     }
 
-    public static UserProfileRes fromEntity(TravelerUser traveler) {
+    public static UserProfileRes fromEntity(TravelerUser traveler, List<Long> photos) {
         return new UserProfileRes(
                 traveler.getUsername(),
                 traveler.getEmail(),
@@ -105,7 +107,8 @@ public class UserProfileRes {
                 traveler.getPhone(),
                 traveler.getAddress(),
                 traveler.getCity(),
-                traveler.getCountry()
+                traveler.getCountry(),
+                photos
         );
     }
 }

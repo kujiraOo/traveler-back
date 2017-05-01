@@ -115,13 +115,6 @@ public class TravelerUserDao extends DAOImpl<TravelerUserRecord, fi.istrange.tra
     }
 
     /**
-     * Fetch records that have <code>photo IN (values)</code>
-     */
-    public List<fi.istrange.traveler.db.tables.pojos.TravelerUser> fetchByPhoto(Long... values) {
-        return fetch(TravelerUser.TRAVELER_USER.PHOTO, values);
-    }
-
-    /**
      * Fetch records that have <code>first_name IN (values)</code>
      */
     public List<fi.istrange.traveler.db.tables.pojos.TravelerUser> fetchByFirstName(String... values) {

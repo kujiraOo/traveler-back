@@ -3,9 +3,7 @@ package fi.istrange.traveler.resources;
 import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.CardType;
-import fi.istrange.traveler.dao.CustomCardDao;
-import fi.istrange.traveler.dao.GroupCardParticipantDao;
+import fi.istrange.traveler.dao.*;
 import fi.istrange.traveler.db.tables.daos.CardDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
@@ -40,6 +38,8 @@ public class GroupCardResource {
     private final CustomCardDao customGroupCardDao;
     private final TravelerUserDao userDAO;
     private final GroupCardParticipantDao participantDAO;
+    private final UserPhotoDao userPhotoDao;
+    private final CardPhotoDao cardPhotoDao;
 
     public GroupCardResource(
             ApplicationBundle applicationBundle
@@ -49,6 +49,8 @@ public class GroupCardResource {
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.participantDAO = new GroupCardParticipantDao();
         this.customGroupCardDao = new CustomCardDao();
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
     }
 
     @GET
@@ -66,7 +68,9 @@ public class GroupCardResource {
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),
-                        principal.getName()
+                        userDAO.fetchOneByUsername(principal.getName()),
+                        userPhotoDao.fetchByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchById(p.getId(), database)
                 )).collect(Collectors.toList());
     }
 
@@ -97,7 +101,9 @@ public class GroupCardResource {
         return GroupCardRes.fromEntity(
                 cardDAO.fetchOneById(cardId),
                 participantDAO.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName()
+                userDAO.fetchOneByUsername(principal.getName()),
+                userPhotoDao.fetchByUsername(principal.getName(), database),
+                cardPhotoDao.fetchById(cardId, database)
         );
     }
 
@@ -109,7 +115,9 @@ public class GroupCardResource {
                 req.getLon(),
                 req.getLat(),
                 username,
-                true
+                true,
+                req.getTitle(),
+                req.getDescription()
         );
     }
 }

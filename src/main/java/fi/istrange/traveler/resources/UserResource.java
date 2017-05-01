@@ -73,8 +73,7 @@ public class UserResource {
                 req.getPhone(),
                 req.getAddress(),
                 req.getCity(),
-                req.getCountry(),
-                req.getPhoto(),
+                req.getCountry(), //TODO: save photo somewhere else
                 req.getFirstName(),
                 req.getLastName()
         );

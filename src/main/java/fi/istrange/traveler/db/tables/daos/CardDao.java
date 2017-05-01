@@ -31,14 +31,14 @@ import org.jooq.impl.DAOImpl;
 public class CardDao extends DAOImpl<CardRecord, fi.istrange.traveler.db.tables.pojos.Card, Long> {
 
     /**
-     * Create a new CustomCardDao without any configuration
+     * Create a new CardDao without any configuration
      */
     public CardDao() {
         super(Card.CARD, fi.istrange.traveler.db.tables.pojos.Card.class);
     }
 
     /**
-     * Create a new CustomCardDao with an attached configuration
+     * Create a new CardDao with an attached configuration
      */
     public CardDao(Configuration configuration) {
         super(Card.CARD, fi.istrange.traveler.db.tables.pojos.Card.class, configuration);
@@ -106,5 +106,19 @@ public class CardDao extends DAOImpl<CardRecord, fi.istrange.traveler.db.tables.
      */
     public List<fi.istrange.traveler.db.tables.pojos.Card> fetchByActive(Boolean... values) {
         return fetch(Card.CARD.ACTIVE, values);
+    }
+
+    /**
+     * Fetch records that have <code>title IN (values)</code>
+     */
+    public List<fi.istrange.traveler.db.tables.pojos.Card> fetchByTitle(String... values) {
+        return fetch(Card.CARD.TITLE, values);
+    }
+
+    /**
+     * Fetch records that have <code>description IN (values)</code>
+     */
+    public List<fi.istrange.traveler.db.tables.pojos.Card> fetchByDescription(String... values) {
+        return fetch(Card.CARD.DESCRIPTION, values);
     }
 }
