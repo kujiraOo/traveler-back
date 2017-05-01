@@ -183,11 +183,12 @@ public class ProfileResource {
     }
 
     @POST
-    @Path("cards/{id}/photos")
+    @Path("card-photos/{id}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation("Upload a photo for a card")
     public Response uploadPersonalCardPhoto(
             @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") Long cardId,
+            @PathParam("id") long cardId,
             @FormDataParam("file") InputStream uploadedPhotoStream,
             @FormDataParam("file") FormDataContentDisposition fileDetail,
             @Context DSLContext database
@@ -212,7 +213,7 @@ public class ProfileResource {
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
-                        principal.getName(),
+                        userDAO.fetchOneByUsername(principal.getName()),
                         userPhotoDao.fetchByUsername(principal.getName(), database),
                         cardPhotoDao.fetchById(p.getId(), database)
                 ))
@@ -235,7 +236,7 @@ public class ProfileResource {
         return GroupCardRes.fromEntity(
                 cardDao.fetchOneById(cardId),
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName(),
+                userDAO.fetchOneByUsername(principal.getName()),
                 userPhotoDao.fetchByUsername(principal.getName(), database),
                 cardPhotoDao.fetchById(cardId, database)
         );
@@ -257,7 +258,7 @@ public class ProfileResource {
         return GroupCardRes.fromEntity(
                 card,
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName(),
+                userDAO.fetchOneByUsername(principal.getName()),
                 userPhotoDao.fetchByUsername(principal.getName(), database),
                 cardPhotoDao.fetchById(cardId, database)
         );

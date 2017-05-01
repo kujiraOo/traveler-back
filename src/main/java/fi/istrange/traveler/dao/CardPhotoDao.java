@@ -39,7 +39,6 @@ public class CardPhotoDao {
 
         // All LargeObject API calls must be within a transaction block
         connection.setAutoCommit(false);
-
         // Get the Large Object Manager to perform operations with
         LargeObjectManager lobj = connection.unwrap(org.postgresql.PGConnection.class).getLargeObjectAPI();
 

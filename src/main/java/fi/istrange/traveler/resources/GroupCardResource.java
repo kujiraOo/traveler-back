@@ -68,7 +68,7 @@ public class GroupCardResource {
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),
-                        principal.getName(),
+                        userDAO.fetchOneByUsername(principal.getName()),
                         userPhotoDao.fetchByUsername(principal.getName(), database),
                         cardPhotoDao.fetchById(p.getId(), database)
                 )).collect(Collectors.toList());
@@ -101,7 +101,7 @@ public class GroupCardResource {
         return GroupCardRes.fromEntity(
                 cardDAO.fetchOneById(cardId),
                 participantDAO.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName(),
+                userDAO.fetchOneByUsername(principal.getName()),
                 userPhotoDao.fetchByUsername(principal.getName(), database),
                 cardPhotoDao.fetchById(cardId, database)
         );

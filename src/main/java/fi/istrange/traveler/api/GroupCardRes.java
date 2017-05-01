@@ -7,7 +7,6 @@ import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,14 +40,10 @@ public class GroupCardRes extends CardRes {
     public static GroupCardRes fromEntity(
             Card card,
             List<TravelerUser> participants,
-            String ownerUN,
+            TravelerUser owner,
             List<Long> userPhotos,
             List<Long> cardPhotos
     ) {
-        Optional<TravelerUser> optionalOwner = participants.stream()
-                .filter(p -> p.getUsername() == ownerUN)
-                .findFirst();
-
         return new GroupCardRes(
                 card.getId(),
                 card.getTitle(),
@@ -57,7 +52,7 @@ public class GroupCardRes extends CardRes {
                 card.getEndTime(),
                 card.getLon(),
                 card.getLat(),
-                optionalOwner.isPresent() ? UserProfileRes.fromEntity(optionalOwner.get(), userPhotos) : null,
+                UserProfileRes.fromEntity(owner, userPhotos),
                 participants.stream()
                         .map(p -> p.getUsername())
                         .collect(Collectors.toList()),
