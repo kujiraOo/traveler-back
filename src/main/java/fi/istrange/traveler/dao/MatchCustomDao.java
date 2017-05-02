@@ -4,8 +4,10 @@ import fi.istrange.traveler.db.tables.records.MatchRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static fi.istrange.traveler.db.Tables.MATCH;
 
@@ -61,7 +63,7 @@ public class MatchCustomDao {
                 .and(MATCH.LIKE_DECISION.equal(like));
     }
 
-    public static List<Long> getMatchingFor(Long likerCardId, DSLContext db) {
+    public static Set<Long> getMatchingFor(Long likerCardId, DSLContext db) {
         // list of card that likerCard likes
         List<Long> liked = db.select()
                 .from(MATCH)
@@ -75,7 +77,7 @@ public class MatchCustomDao {
                         .and(MATCH.LIKED_CARD_ID.equal(likerCardId))
                         .and(MATCH.LIKE_DECISION.equal(true)))
                 .fetch(MATCH.LIKER_CARD_ID);
-        return match;
+        return new HashSet<>(match);
     }
 
 }
