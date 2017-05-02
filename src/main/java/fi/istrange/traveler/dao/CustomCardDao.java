@@ -90,7 +90,7 @@ public class CustomCardDao {
 
     }
 
-    public List<Card> fetchByPosition(
+    public static List<Card> fetchByPosition(
             CardType type,
             BigDecimal lat,
             BigDecimal lon,
@@ -98,7 +98,7 @@ public class CustomCardDao {
             int offset,
             DSLContext database
     ) {
-        // TODO: change 1 to the value that atually makes sense
+        // TODO: change 1 to the value that actually makes sense
         return fetch(
                 type,
                 Tables.CARD.LAT.between(
@@ -115,7 +115,7 @@ public class CustomCardDao {
         );
     }
 
-    public List<Card> fetchByUsername(
+    public static List<Card> fetchByUsername(
             CardType type,
             String username,
             boolean fetchArchived,
@@ -131,23 +131,23 @@ public class CustomCardDao {
         );
     }
 
-    public List<Card> fetchAll(
-            CardType type,
-            boolean fetchArchived,
-            int offset,
-            DSLContext database
-    ) {
-        return fetch(
-                type,
-                Tables.CARD.ID.greaterOrEqual(0L), // workaround because not able to pass boolean
-                fetchArchived,
-                offset,
-                database
-        );
-    }
+//    public List<Card> fetchAll(
+//            CardType type,
+//            boolean fetchArchived,
+//            int offset,
+//            DSLContext database
+//    ) {
+//        return fetch(
+//                type,
+//                Tables.CARD.ID.greaterOrEqual(0L), // workaround because not able to pass boolean
+//                fetchArchived,
+//                offset,
+//                database
+//        );
+//    }
 
 
-    public List<Card> fetch(
+    private static List<Card> fetch(
             CardType type,
             Condition condition,
             boolean fetchArchived,

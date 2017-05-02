@@ -5,8 +5,6 @@ import fi.istrange.traveler.auth.Authenticator;
 import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.dao.*;
 import fi.istrange.traveler.db.tables.daos.CardDao;
-import fi.istrange.traveler.db.tables.daos.GroupCardDao;
-import fi.istrange.traveler.db.tables.daos.PersonalCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
@@ -32,6 +30,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static fi.istrange.traveler.dao.CredentialDao.updatePassword;
+
 /**
  * Created by arsenii on 4/13/17.
  */
@@ -47,9 +47,6 @@ public class ProfileResource {
     private final CardPhotoDao cardPhotoDao;
     private final GroupCardParticipantDao participantDao;
     private final CustomCardDao customPersonalCardDao;
-    private final CredentialDao credentialDao;
-    private final PersonalCardDao personalCardDao;
-    private final GroupCardDao groupCardDao;
 
     @Inject
     public ProfileResource(
@@ -57,11 +54,8 @@ public class ProfileResource {
     ) {
         auth = new Authenticator();
         cardDao = new CardDao(applicationBundle.getJooqBundle().getConfiguration());
-        credentialDao = new CredentialDao();
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
-        groupCardDao = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
-        personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         customPersonalCardDao = new CustomCardDao();
         userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
         cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
@@ -108,8 +102,8 @@ public class ProfileResource {
         auth.authenticate(principal.getName(), request.getOldPassword(), database);
 
         String hashedPassword = BCrypt.hashpw(request.getNewPassword(), BCrypt.gensalt());
-;
-        credentialDao.updatePassword(principal.getName(), hashedPassword, database);
+
+        updatePassword(principal.getName(), hashedPassword, database);
 
         return Response.accepted().build();
     }

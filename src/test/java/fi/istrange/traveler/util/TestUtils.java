@@ -27,6 +27,7 @@ public class TestUtils {
         db.delete(Tables.GROUP_CARD).execute();
         db.delete(Tables.MATCH).execute();
         db.delete(CARD).execute();
+        db.delete(Tables.USER_CREDENTIALS).execute();
         db.delete(Tables.TRAVELER_USER).execute();
     }
 
