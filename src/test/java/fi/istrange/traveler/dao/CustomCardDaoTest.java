@@ -51,7 +51,7 @@ public class CustomCardDaoTest extends AbstractDaoTest {
         IntStream.range(0, TEST_ITERATION).forEach(
                 i -> {
                     Long card = createGroupTravelCardForUser("a");
-                    assertTrue(CustomCardDao.isPersonalTravelCard(card, db));
+                    assertTrue(CustomCardDao.isGroupTravelCard(card, db));
                 }
         );
     }

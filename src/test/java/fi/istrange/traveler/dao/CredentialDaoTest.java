@@ -43,11 +43,14 @@ public class CredentialDaoTest extends AbstractDaoTest {
     public void deactivateUser() {
         IntStream.range(0, 100).forEach(
                 i -> {
-                    CredentialDao.addUser(String.valueOf(i), "youShallNotPass", db);
+                    String userName = String.valueOf(i);
+                    createUser(userName, Date.valueOf("2015-10-10"), "gay");
+                    CredentialDao.addUser(userName, "youShallNotPass", db);
+                    CredentialDao.deactivateUser(userName, db);
                     Optional<fi.istrange.traveler.db.tables.pojos.UserCredentials> result = fetchByUsername(String.valueOf(i), db);
-                    CredentialDao.deactivateUser(String.valueOf(i), db);
                     assertTrue(result.isPresent());
-                    assertTrue(result.get().getUsername().equals(String.valueOf(i)));
+                    assertTrue(result.get().getUsername().equals(userName));
+                    System.out.println(result.get().getActive());
                     assertTrue(result.get().getActive().equals(Boolean.FALSE));
                 }
         );
