@@ -76,7 +76,7 @@ public class MatchResource {
             throw new BadRequestException("Dump request");
         }
 
-        MatchCustomDao.createOrUpdateMatch(myCardId, likedCardId, true, db);
+        MatchCustomDao.createOrUpdateLike(myCardId, likedCardId, true, db);
 
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }
@@ -99,7 +99,7 @@ public class MatchResource {
             throw new BadRequestException("Dump request");
         }
 
-        MatchCustomDao.createOrUpdateMatch(myCardId, likedCardId, false, db);
+        MatchCustomDao.createOrUpdateLike(myCardId, likedCardId, false, db);
 
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }

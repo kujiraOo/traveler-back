@@ -2,18 +2,15 @@ package fi.istrange.traveler.resources.profile;
 
 import fi.istrange.traveler.api.MatchForCardRes;
 import fi.istrange.traveler.api.MatchResultRes;
-import fi.istrange.traveler.db.Tables;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import org.junit.*;
 
 import javax.ws.rs.BadRequestException;
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Random;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static fi.istrange.traveler.db.Tables.*;
 
 /**
  * Created by rohan on 4/25/17.
@@ -21,137 +18,6 @@ import static fi.istrange.traveler.db.Tables.*;
 public class MatchResourceTest extends ResourceTest {
 
     private final MatchResource matchResource = new MatchResource(appBun);
-
-
-    private Long createCard(
-            String userName,
-            boolean active,
-            Date startTime,
-            Date endTime,
-            BigDecimal lat,
-            BigDecimal lon
-    ) {
-        return db.insertInto(
-                Tables.CARD,
-                CARD.ACTIVE, CARD.START_TIME, CARD.END_TIME, CARD.LAT, CARD.LON, CARD.OWNER_FK
-        ).values(
-                active,
-                startTime, endTime,
-                lat, lon,
-                userName
-        ).returning(CARD.ID).fetchOne().getValue(CARD.ID);
-    }
-
-    private Long createUserWithGroupTravelCard(
-            String userName,
-            Date birthDate,
-            String sex,
-            boolean active,
-            Date startTime,
-            Date endTime,
-            BigDecimal lat,
-            BigDecimal lon
-    ) {
-        createUser(userName, birthDate, sex);
-        return createGroupTravelCardForUser(userName, active, startTime, endTime, lat, lon);
-    }
-
-    private Long createUserWithPersonalTravelCard(
-            String userName,
-            Date birthDate,
-            String sex,
-            boolean active,
-            Date startTime,
-            Date endTime,
-            BigDecimal lat,
-            BigDecimal lon
-    ) {
-        createUser(userName, birthDate, sex);
-        return createPersonalTravelCardForUser(userName, active, startTime, endTime, lat, lon);
-    }
-
-    private void createUser(String userName, Date birthDate, String sex) {
-        db.insertInto(
-                Tables.TRAVELER_USER,
-                TRAVELER_USER.USERNAME, TRAVELER_USER.BIRTH, TRAVELER_USER.GENDER
-        ).values(userName, birthDate, sex).execute();
-    }
-
-    private Long createPersonalTravelCardForUser(
-            String userName,
-            Boolean active,
-            Date startDate,
-            Date endDate,
-            BigDecimal lat,
-            BigDecimal lon
-    ) {
-        Long id = createCard(userName, active, startDate, endDate, lat, lon);
-        db.insertInto(
-                Tables.PERSONAL_CARD,
-                PERSONAL_CARD.ID
-        ).values(id).execute();
-        return id;
-    }
-
-    private Long createGroupTravelCardForUser(
-            String userName,
-            Boolean active,
-            Date startDate,
-            Date endDate,
-            BigDecimal lat,
-            BigDecimal lon
-    ) {
-        Long id = createCard(userName, active, startDate, endDate, lat, lon);
-
-        db.insertInto(
-                Tables.GROUP_CARD,
-                GROUP_CARD.ID
-        ).values(id).execute();
-        return id;
-    }
-
-    private Long createUserWithPersonalTravelCard(String userName) {
-        return createUserWithPersonalTravelCard(
-                userName, Date.valueOf("2017-10-04"), "gay",
-                true,
-                Date.valueOf("2017-10-05"), Date.valueOf("2017-10-14"),
-                BigDecimal.ONE, BigDecimal.TEN
-        );
-    }
-
-    private Long createUserWithGroupTravelCard(String userName) {
-        return createUserWithGroupTravelCard(
-                userName, Date.valueOf("2017-10-04"), "gay",
-                true,
-                Date.valueOf("2017-10-05"), Date.valueOf("2017-10-14"),
-                BigDecimal.ONE, BigDecimal.TEN
-        );
-    }
-
-    private Long createPersonalTravelCardForUser(String userName) {
-        return createPersonalTravelCardForUser(
-                userName,
-                true,
-                Date.valueOf("2018-10-04"),
-                Date.valueOf("2018-10-05"),
-                BigDecimal.ONE, BigDecimal.TEN
-        );
-    }
-
-    private Long createGroupTravelCardForUser(String userName) {
-        return createGroupTravelCardForUser(
-                userName,
-                true,
-                Date.valueOf("2018-10-04"),
-                Date.valueOf("2018-10-05"),
-                BigDecimal.ONE, BigDecimal.TEN
-        );
-    }
-
-    private void addUserToGroupCard(String userName, Long groupCardId) {
-        db.insertInto(Tables.CARD_USER, CARD_USER.USERNAME, CARD_USER.CARD_ID)
-                .values(userName, groupCardId).execute();
-    }
 
     @Test
     public void getMatching_Empty_PersonalTravelCard() throws Exception {

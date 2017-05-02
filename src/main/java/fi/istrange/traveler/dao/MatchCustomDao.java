@@ -14,7 +14,7 @@ import static fi.istrange.traveler.db.Tables.MATCH;
  */
 public class MatchCustomDao {
 
-    public static void createOrUpdateMatch(Long likerCardId, Long likedCardId, boolean like, DSLContext db) {
+    public static void createOrUpdateLike(Long likerCardId, Long likedCardId, boolean like, DSLContext db) {
         Optional<MatchRecord> matchRecord = db.
                 selectFrom(MATCH)
                 .where(
