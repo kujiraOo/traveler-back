@@ -11,23 +11,23 @@ import java.util.List;
  * Created by arsenii on 4/9/17.
  */
 public class UserProfileRes {
-    private String username;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private Date birthday;
-    private String phone;
-    private String address;
-    private String city;
-    private String country;
-    private List<Long> photos;
+    private final String username;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+    private final Date birthday;
+    private final String phone;
+    private final String address;
+    private final String city;
+    private final String country;
+    private final List<Long> photos;
 
     @JsonCreator
     public UserProfileRes(
-            @JsonProperty("password") String username,
-            @JsonProperty("email") String email,
-            @JsonProperty("firstName") String firstName,
-            @JsonProperty("lastName") String lastName,
+            String username,
+            String email,
+            String firstName,
+            String lastName,
             Date birthday,
             String phone,
             String address,

@@ -4,30 +4,31 @@ import fi.istrange.traveler.db.Tables;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Result;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by aleksandr on 16.4.2017.
  */
 public class GroupCardParticipantDao {
 
-    public List<TravelerUser> getGroupCardParticipants(
+    public static Set<TravelerUser> getGroupCardParticipants(
             Long cardId,
             DSLContext database,
             TravelerUserDao userDAO
     ) {
-        Result<Record1<String>> usernames = database.select(Tables.CARD_USER.USERNAME)
+        List<String> usernames = database
+                .select()
                 .from(Tables.CARD_USER)
                 .where(Tables.CARD_USER.CARD_ID.equal(cardId))
-                .fetch();
+                .fetch(Tables.CARD_USER.USERNAME);
 
-        return userDAO.fetchByUsername(usernames.intoArray(Tables.CARD_USER.USERNAME));
+        return new HashSet<>(userDAO.fetchByUsername(usernames.toArray(new String[0])));
     }
 
-    public void addGroupCardParticipant(
+    public static void addGroupCardParticipant(
             Long cardId,
             String username,
             DSLContext database
@@ -40,17 +41,7 @@ public class GroupCardParticipantDao {
             .execute();
     }
 
-    public void deleteGroupCardParticipant(
-            Long cardId,
-            String username,
-            DSLContext database
-    ) {
-        database.deleteFrom(Tables.CARD_USER)
-                .where(Tables.CARD_USER.CARD_ID.equal(cardId).and(Tables.CARD_USER.USERNAME.equal(username)))
-                .execute();
-    }
-
-    public void deleteGroupCardParticipant(
+    public static void deleteGroupCardParticipant(
             Long cardId,
             DSLContext database
     ) {
@@ -59,22 +50,13 @@ public class GroupCardParticipantDao {
                 .execute();
     }
 
-    public void deleteGroupCardParticipant(
-            String username,
-            DSLContext database
-    ) {
-        database.deleteFrom(Tables.CARD_USER)
-                .where(Tables.CARD_USER.USERNAME.equal(username))
-                .execute();
-    }
-
-    public void updateGroupCardParticipants(
+    public static void updateGroupCardParticipants(
             Long cardId,
             List<String> participants,
             DSLContext database
     ) {
-        this.deleteGroupCardParticipant(cardId, database);
+        deleteGroupCardParticipant(cardId, database);
         participants.stream()
-                .forEach(p -> this.addGroupCardParticipant(cardId, p, database));
+                .forEach(p -> addGroupCardParticipant(cardId, p, database));
     }
 }

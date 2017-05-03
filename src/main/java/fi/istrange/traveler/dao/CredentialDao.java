@@ -10,7 +10,7 @@ import java.util.Optional;
  * Created by aleksandr on 18.4.2017.
  */
 public class CredentialDao {
-    public Optional<UserCredentials> fetchByUsername(
+    public static Optional<UserCredentials> fetchByUsername(
             String username,
             DSLContext database
     ) {
@@ -24,7 +24,7 @@ public class CredentialDao {
                 )).stream().findFirst();
     }
 
-    public void addUser(
+    public static void addUser(
             String username,
             String password,
             DSLContext database
@@ -39,7 +39,7 @@ public class CredentialDao {
                 .execute();
     }
 
-    public void deactivateUser(
+    public static void deactivateUser(
             String username,
             DSLContext database
     ) {
@@ -49,7 +49,7 @@ public class CredentialDao {
                 .execute();
     }
 
-    public void updatePassword(
+    public static void updatePassword(
             String username,
             String password,
             DSLContext database

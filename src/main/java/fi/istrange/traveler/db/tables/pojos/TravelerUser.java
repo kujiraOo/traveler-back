@@ -4,6 +4,8 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
+import com.google.common.base.Objects;
+
 import javax.annotation.Generated;
 import java.io.Serializable;
 import java.sql.Date;
@@ -171,5 +173,27 @@ public class TravelerUser implements Serializable {
 
         sb.append(")");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TravelerUser that = (TravelerUser) o;
+        return Objects.equal(username, that.username) &&
+                Objects.equal(birth, that.birth) &&
+                Objects.equal(gender, that.gender) &&
+                Objects.equal(email, that.email) &&
+                Objects.equal(phone, that.phone) &&
+                Objects.equal(address, that.address) &&
+                Objects.equal(city, that.city) &&
+                Objects.equal(country, that.country) &&
+                Objects.equal(firstName, that.firstName) &&
+                Objects.equal(lastName, that.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(username, birth, gender, email, phone, address, city, country, firstName, lastName);
     }
 }

@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 @Api(value = "/profile/cards/", tags = "match traveller cards")
 @PermitAll
 public class MatchResource {
-    private final fi.istrange.traveler.db.tables.daos.CardDao cardDao;
     private final TravelerUserDao userDAO;
     private final UserPhotoDao userPhotoDao;
     private final CardPhotoDao cardPhotoDao;
@@ -40,7 +39,6 @@ public class MatchResource {
     public MatchResource(
             ApplicationBundle applicationBundle
     ) {
-        this.cardDao = new fi.istrange.traveler.db.tables.daos.CardDao();
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
         this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
@@ -76,7 +74,7 @@ public class MatchResource {
             throw new BadRequestException("Dump request");
         }
 
-        MatchCustomDao.createOrUpdateMatch(myCardId, likedCardId, true, db);
+        MatchCustomDao.createOrUpdateLike(myCardId, likedCardId, true, db);
 
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }
@@ -99,7 +97,7 @@ public class MatchResource {
             throw new BadRequestException("Dump request");
         }
 
-        MatchCustomDao.createOrUpdateMatch(myCardId, likedCardId, false, db);
+        MatchCustomDao.createOrUpdateLike(myCardId, likedCardId, false, db);
 
         return new MatchResultRes(MatchCustomDao.isMatch(myCardId, likedCardId, db));
     }

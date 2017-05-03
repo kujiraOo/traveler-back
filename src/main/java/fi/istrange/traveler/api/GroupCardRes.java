@@ -7,6 +7,7 @@ import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +40,7 @@ public class GroupCardRes extends CardRes {
 
     public static GroupCardRes fromEntity(
             Card card,
-            List<TravelerUser> participants,
+            Set<TravelerUser> participants,
             TravelerUser owner,
             List<Long> userPhotos,
             List<Long> cardPhotos

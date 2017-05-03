@@ -1,6 +1,10 @@
-package fi.istrange.traveler.util;
+package fi.istrange.traveler.resources;
 
+import com.bendb.dropwizard.jooq.JooqBundle;
+import fi.istrange.traveler.TravelerConfiguration;
+import fi.istrange.traveler.bundle.ApplicationBundle;
 import fi.istrange.traveler.db.Tables;
+import fi.istrange.traveler.util.TestUtils;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -16,31 +20,23 @@ import java.sql.Date;
 import java.sql.DriverManager;
 
 import static fi.istrange.traveler.db.Tables.*;
+import static fi.istrange.traveler.db.Tables.CARD_USER;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
- * Created by rohan on 4/25/17.
+ * Created by rohan on 4/26/17.
  */
-public class TestUtils {
-    public static void deleteAllTablesContent(DSLContext db) {
-        db.delete(Tables.PERSONAL_CARD).execute();
-        db.delete(Tables.CARD_USER).execute();
-        db.delete(Tables.GROUP_CARD).execute();
-        db.delete(Tables.MATCH).execute();
-        db.delete(CARD).execute();
-        db.delete(Tables.USER_CREDENTIALS).execute();
-        db.delete(Tables.TRAVELER_USER).execute();
-    }
+public class AbstractResourceTest extends TestUtils{
+    protected static ApplicationBundle appBun = mock(ApplicationBundle.class);
+    private static JooqBundle<TravelerConfiguration> jooqBundle = mock(JooqBundle.class);
 
-    protected static Connection conn;
-    protected static DSLContext db;
-    protected static Configuration configuration;
 
     @BeforeClass
     public static void setUp() {
-        conn = getDatabaseConnection();
-        db = getDSLContext();
-        configuration = new DefaultConfiguration();
-        configuration.set(conn);
+        TestUtils.setUp();
+        when(appBun.getJooqBundle()).thenReturn(jooqBundle);
+        when(jooqBundle.getConfiguration()).thenReturn(configuration);
     }
 
     @AfterClass
@@ -59,12 +55,12 @@ public class TestUtils {
 
     @After
     public void tearDownn() {
-        deleteAllTablesContent(db);
+        TestUtils.deleteAllTablesContent(db);
     }
 
     private static final String userName = "postgres";
     private static final String password = "";
-    private static final String url = "jdbc:postgresql://127.0.0.1:5032/traveler";
+    private static final String url = "jdbc:postgresql://127.0.0.1:5432/traveler";
 
     private static Connection getDatabaseConnection() {
         try {
@@ -92,7 +88,7 @@ public class TestUtils {
             BigDecimal lon
     ) {
         return db.insertInto(
-                CARD,
+                Tables.CARD,
                 CARD.ACTIVE, CARD.START_TIME, CARD.END_TIME, CARD.LAT, CARD.LON, CARD.OWNER_FK
         ).values(
                 active,
@@ -212,6 +208,5 @@ public class TestUtils {
         db.insertInto(Tables.CARD_USER, CARD_USER.USERNAME, CARD_USER.CARD_ID)
                 .values(userName, groupCardId).execute();
     }
-
 
 }
