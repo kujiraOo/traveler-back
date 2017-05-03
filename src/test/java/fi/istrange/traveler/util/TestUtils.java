@@ -21,21 +21,12 @@ import static fi.istrange.traveler.db.Tables.*;
  * Created by rohan on 4/25/17.
  */
 public class TestUtils {
-    public static void deleteAllTablesContent(DSLContext db) {
-        db.delete(Tables.USER_PHOTO).execute();
-        db.delete(Tables.CARD_PHOTO).execute();
-        db.delete(Tables.PERSONAL_CARD).execute();
-        db.delete(Tables.CARD_USER).execute();
-        db.delete(Tables.GROUP_CARD).execute();
-        db.delete(Tables.MATCH).execute();
-        db.delete(CARD).execute();
-        db.delete(Tables.USER_CREDENTIALS).execute();
-        db.delete(Tables.TRAVELER_USER).execute();
-    }
-
     protected static Connection conn;
     protected static DSLContext db;
     protected static Configuration configuration;
+    private static final String userName = "postgres";
+    private static final String password = "";
+    private static final String url = "jdbc:postgresql://127.0.0.1:5032/traveler";
 
     @BeforeClass
     public static void setUp() {
@@ -64,9 +55,17 @@ public class TestUtils {
         deleteAllTablesContent(db);
     }
 
-    private static final String userName = "postgres";
-    private static final String password = "";
-    private static final String url = "jdbc:postgresql://127.0.0.1:5032/traveler";
+    public static void deleteAllTablesContent(DSLContext db) {
+        db.delete(Tables.USER_PHOTO).execute();
+        db.delete(Tables.CARD_PHOTO).execute();
+        db.delete(Tables.PERSONAL_CARD).execute();
+        db.delete(Tables.CARD_USER).execute();
+        db.delete(Tables.GROUP_CARD).execute();
+        db.delete(Tables.MATCH).execute();
+        db.delete(CARD).execute();
+        db.delete(Tables.USER_CREDENTIALS).execute();
+        db.delete(Tables.TRAVELER_USER).execute();
+    }
 
     private static Connection getDatabaseConnection() {
         try {
@@ -214,6 +213,5 @@ public class TestUtils {
         db.insertInto(Tables.CARD_USER, CARD_USER.USERNAME, CARD_USER.CARD_ID)
                 .values(userName, groupCardId).execute();
     }
-
 
 }

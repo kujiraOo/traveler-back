@@ -121,12 +121,7 @@ public class ProfileResource {
 
         return this.customPersonalCardDao.fetchByUsername(CardType.PERSONAL, principal.getName(), includeArchived, offset, database)
                 .stream()
-                .map(p -> PersonalCardRes.fromEntity(
-                        p,
-                        user,
-                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
-                ))
+                .map(p -> buildPersonalCardRes(user, p, database))
                 .collect(Collectors.toList());
     }
 
@@ -147,12 +142,7 @@ public class ProfileResource {
                 )
         );
 
-        return PersonalCardRes.fromEntity(
-                this.cardDao.fetchOneById(personalCardId),
-                userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                cardPhotoDao.fetchPhotoOidByCardId(personalCardId, database)
-        );
+        return buildPersonalCardRes(principal.getName(), personalCardId, database);
     }
 
     @DELETE
@@ -168,12 +158,24 @@ public class ProfileResource {
         card.setActive(false);
         cardDao.update(card);
 
+        return buildPersonalCardRes(principal.getName(), card, database);
+    }
+
+    private PersonalCardRes buildPersonalCardRes(TravelerUser user, Card card, DSLContext db) {
         return PersonalCardRes.fromEntity(
                 card,
-                userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                cardPhotoDao.fetchPhotoOidByCardId(personalCardId, database)
+                user,
+                userPhotoDao.fetchPhotoOidByUsername(user.getUsername(), db),
+                cardPhotoDao.fetchPhotoOidByCardId(card.getId(), db)
         );
+    }
+
+    private PersonalCardRes buildPersonalCardRes(String userName, Card card, DSLContext db) {
+        return buildPersonalCardRes(userDAO.fetchOneByUsername(userName), card, db);
+    }
+
+    private PersonalCardRes buildPersonalCardRes(String userName, Long cardId, DSLContext db) {
+        return buildPersonalCardRes(userName, cardDao.fetchOneById(cardId), db);
     }
 
     @POST
@@ -204,13 +206,7 @@ public class ProfileResource {
         return customPersonalCardDao
                 .fetchByUsername(CardType.GROUP, principal.getName(), includeArchived, offset, database)
                 .stream()
-                .map(p -> GroupCardRes.fromEntity(
-                        p,
-                        participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
-                        userDAO.fetchOneByUsername(principal.getName()),
-                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
-                ))
+                .map(p -> buildGroupCardRes(principal.getName(), p, database))
                 .collect(Collectors.toList());
     }
 
@@ -227,13 +223,7 @@ public class ProfileResource {
         cardDao.update(fromUpdateReq(groupCardUpdateReq, cardDao.fetchOneById(cardId)));
         participantDao.updateGroupCardParticipants(cardId, groupCardUpdateReq.getParticipants(), database);
 
-        return GroupCardRes.fromEntity(
-                cardDao.fetchOneById(cardId),
-                participantDao.getGroupCardParticipants(cardId, database, userDAO),
-                userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
-        );
+        return buildGroupCardRes(principal.getName(), cardId, database);
     }
 
     @DELETE
@@ -249,13 +239,7 @@ public class ProfileResource {
         card.setActive(false);
         cardDao.update(card);
 
-        return GroupCardRes.fromEntity(
-                card,
-                participantDao.getGroupCardParticipants(cardId, database, userDAO),
-                userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
-        );
+        return buildGroupCardRes(principal.getName(), card, database);
     }
 
     @POST
@@ -286,16 +270,21 @@ public class ProfileResource {
         return user;
     }
 
-    private static Card fromUpdateReq(PersonalCardUpdateReq req, Card card) {
-        card.setStartTime(req.getStartTime());
-        card.setEndTime(req.getEndTime());
-        card.setLon(req.getLon());
-        card.setLat(req.getLat());
-
-        return card;
+    private GroupCardRes buildGroupCardRes(String userName, Long cardId, DSLContext db) {
+        return buildGroupCardRes(userName, cardDao.fetchOneById(cardId), db);
     }
 
-    private static Card fromUpdateReq(GroupCardUpdateReq req, Card card) {
+    private GroupCardRes buildGroupCardRes(String userName, Card card, DSLContext db) {
+        return GroupCardRes.fromEntity(
+                card,
+                participantDao.getGroupCardParticipants(card.getId(), db, userDAO),
+                userDAO.fetchOneByUsername(userName),
+                userPhotoDao.fetchPhotoOidByUsername(userName, db),
+                cardPhotoDao.fetchPhotoOidByCardId(card.getId(), db)
+        );
+    }
+
+    private static Card fromUpdateReq(CardUpdateReq req, Card card) {
         card.setStartTime(req.getStartTime());
         card.setEndTime(req.getEndTime());
         card.setLon(req.getLon());
