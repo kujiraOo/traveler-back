@@ -51,8 +51,8 @@ public class PersonalCardResource {
         this.personalCardDao = new PersonalCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.customPersonalCardDao = new CustomCardDao();
-        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
-        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
     }
 
     @GET
@@ -70,8 +70,8 @@ public class PersonalCardResource {
                 .map(p -> PersonalCardRes.fromEntity(
                         p,
                         userDAO.fetchOneByUsername(principal.getName()),
-                        userPhotoDao.fetchByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchById(p.getId(), database)
+                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
                 ))
                 .collect(Collectors.toList());
     }
@@ -90,8 +90,8 @@ public class PersonalCardResource {
         return PersonalCardRes.fromEntity(
                 this.cardDAO.fetchOneById(personalCardCreationReq.getId()),
                 userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database),
-                cardPhotoDao.fetchById(personalCardCreationReq.getId(), database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(personalCardCreationReq.getId(), database)
         );
     }
 
@@ -109,8 +109,8 @@ public class PersonalCardResource {
                 .map(p -> PersonalCardRes.fromEntity(
                         p,
                         userDAO.fetchOneByUsername(principal.getName()),
-                        userPhotoDao.fetchByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchById(personalCardId, database)
+                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchPhotoOidByCardId(personalCardId, database)
                 ))
                 .findFirst();
     }

@@ -1,7 +1,7 @@
 package fi.istrange.traveler.dao;
 
 import fi.istrange.traveler.db.Tables;
-import org.jooq.Configuration;
+import org.jooq.ConnectionProvider;
 import org.jooq.DSLContext;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
@@ -17,13 +17,13 @@ import java.util.List;
  * Created by aleksandr on 30.4.2017.
  */
 public class CardPhotoDao {
-    private final Connection connection;
+    private final ConnectionProvider connectionProvider;
 
-    public CardPhotoDao(Configuration configuration) {
-        connection = configuration.connectionProvider().acquire();
+    public CardPhotoDao(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
 
-    public List<Long> fetchById(
+    public List<Long> fetchPhotoOidByCardId(
             Long id,
             DSLContext database
     ) {
@@ -35,7 +35,9 @@ public class CardPhotoDao {
                 );
     }
 
-    public void addPhoto(Long id, InputStream uploadedPhotoStream) throws SQLException, IOException {
+    public long addPhoto(Long id, InputStream uploadedPhotoStream) throws SQLException, IOException {
+
+        Connection connection = connectionProvider.acquire();
 
         // All LargeObject API calls must be within a transaction block
         connection.setAutoCommit(false);
@@ -70,12 +72,15 @@ public class CardPhotoDao {
 
             // Commit the transaction
             connection.commit();
+            return oid;
         } catch (Exception e) {
 
             // Rollback the transaction if saving of the photo failed
             connection.rollback();
 
             throw (e);
+        } finally {
+            connectionProvider.release(connection);
         }
     }
 }

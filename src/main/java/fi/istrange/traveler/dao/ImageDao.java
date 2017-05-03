@@ -18,6 +18,12 @@ public class ImageDao {
         this.connectionProvider = connectionProvider;
     }
 
+    /**
+     * Get data for image object specified by given oid
+     * @param oid
+     * @return null if given invalid oid
+     * @throws SQLException
+     */
     public byte[] getImageBuffer(long oid) throws SQLException {
 
         byte buf[] = null;

@@ -22,6 +22,8 @@ import static fi.istrange.traveler.db.Tables.*;
  */
 public class TestUtils {
     public static void deleteAllTablesContent(DSLContext db) {
+        db.delete(Tables.USER_PHOTO).execute();
+        db.delete(Tables.CARD_PHOTO).execute();
         db.delete(Tables.PERSONAL_CARD).execute();
         db.delete(Tables.CARD_USER).execute();
         db.delete(Tables.GROUP_CARD).execute();
