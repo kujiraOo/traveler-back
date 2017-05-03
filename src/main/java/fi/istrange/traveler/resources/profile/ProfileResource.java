@@ -261,10 +261,12 @@ public class ProfileResource {
     private static TravelerUser fromUpdateReq (UserProfileUpdateReq req, TravelerUser user) {
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
+        user.setEmail(req.getEmail());
+        user.setBirth(req.getBirthday());
+        user.setPhone(req.getPhone());
         user.setAddress(req.getAddress());
         user.setCity(req.getCity());
         user.setCountry(req.getCountry());
-        user.setBirth(req.getBirthday());
         user.setGender(req.getGender());
 
         return user;
@@ -287,6 +289,8 @@ public class ProfileResource {
     private static Card fromUpdateReq(CardUpdateReq req, Card card) {
         card.setStartTime(req.getStartTime());
         card.setEndTime(req.getEndTime());
+        card.setTitle(req.getTitle());
+        card.setDescription(req.getDescription());
         card.setLon(req.getLon());
         card.setLat(req.getLat());
 

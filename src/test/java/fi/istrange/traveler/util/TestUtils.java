@@ -1,9 +1,11 @@
 package fi.istrange.traveler.util;
 
 import fi.istrange.traveler.db.Tables;
+import liquibase.logging.core.DefaultLoggerConfiguration;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.junit.After;
@@ -34,6 +36,7 @@ public class TestUtils {
         db = getDSLContext();
         configuration = new DefaultConfiguration();
         configuration.set(conn);
+        configuration.set(SQLDialect.POSTGRES_9_5);
     }
 
     @AfterClass
@@ -136,6 +139,34 @@ public class TestUtils {
                 Tables.TRAVELER_USER,
                 TRAVELER_USER.USERNAME, TRAVELER_USER.BIRTH, TRAVELER_USER.GENDER
         ).values(userName, birthDate, sex).execute();
+    }
+
+    protected void createUser(
+            String userName,
+            String lastName,
+            String firstName,
+            String email,
+            String phone,
+            String address,
+            String city,
+            String country,
+            Date birthDate,
+            String sex
+    ) {
+        db.insertInto(
+                Tables.TRAVELER_USER,
+                TRAVELER_USER.USERNAME,
+                TRAVELER_USER.LAST_NAME,
+                TRAVELER_USER.FIRST_NAME,
+                TRAVELER_USER.EMAIL,
+                TRAVELER_USER.PHONE,
+                TRAVELER_USER.ADDRESS,
+                TRAVELER_USER.CITY,
+                TRAVELER_USER.COUNTRY,
+                TRAVELER_USER.BIRTH,
+                TRAVELER_USER.GENDER
+        ).values(userName, lastName, firstName, email, phone, address, city, country, birthDate, sex)
+                .execute();
     }
 
     protected Long createPersonalTravelCardForUser(

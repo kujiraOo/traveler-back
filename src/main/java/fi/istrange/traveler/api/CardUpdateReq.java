@@ -17,7 +17,6 @@ public class CardUpdateReq {
     private Date endTime;
     private BigDecimal lon;
     private BigDecimal lat;
-    private List<Long> photos;
 
     @JsonCreator
     public CardUpdateReq(

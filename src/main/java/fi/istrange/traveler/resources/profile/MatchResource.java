@@ -179,6 +179,7 @@ public class MatchResource {
                                                 ),
                                                 userPhotoDao.fetchPhotoOidByUsername(pcRecord.get(Tables.CARD.OWNER_FK), db)
                                         ),
+                                        pcRecord.get(Tables.CARD.ACTIVE),
                                         cardPhotoDao.fetchPhotoOidByCardId(pcRecord.get(Tables.CARD.ID), db)
                                 )
                         )
@@ -205,6 +206,7 @@ public class MatchResource {
                                         ),
                                         userPhotoDao.fetchPhotoOidByUsername(record.get(Tables.CARD.OWNER_FK), db)
                                 ),
+                                record.get(Tables.CARD.ACTIVE),
                                 db.select().
                                         from(Tables.CARD_USER)
                                         .where(Tables.CARD_USER.CARD_ID.equal(
