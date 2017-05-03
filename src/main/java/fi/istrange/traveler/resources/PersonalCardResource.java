@@ -67,6 +67,7 @@ public class PersonalCardResource {
             ) {
         return customPersonalCardDao.fetchByPosition(CardType.PERSONAL, lat, lng, includeArchived, offset, database)
                 .stream()
+                .filter(p -> !p.getOwnerFk().equals(principal.getName()))
                 .map(p -> PersonalCardRes.fromEntity(
                         p,
                         userDAO.fetchOneByUsername(principal.getName()),

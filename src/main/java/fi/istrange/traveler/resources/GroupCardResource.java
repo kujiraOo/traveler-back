@@ -65,6 +65,7 @@ public class GroupCardResource {
     ) {
         return customGroupCardDao.fetchByPosition(CardType.GROUP, lat, lng, includeArchived, offset, database)
                 .stream()
+                .filter(p -> !p.getOwnerFk().equals(principal.getName()))
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),
