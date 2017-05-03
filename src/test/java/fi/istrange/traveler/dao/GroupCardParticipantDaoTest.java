@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static fi.istrange.traveler.dao.GroupCardParticipantDao.*;
-
 import static org.junit.Assert.*;
 
 /**
@@ -25,10 +23,10 @@ public class GroupCardParticipantDaoTest extends AbstractDaoTest {
     private final int TEST_ITERATION = 2;
 
     @Test
-    public void getGroupCardParticipantss_invalidCardId() {
+    public void getGroupCardParticipants_invalidCardId() {
         IntStream.range(0, TEST_ITERATION).forEach(
                 i -> {
-                    Set<TravelerUser> list = getGroupCardParticipants(
+                    Set<TravelerUser> list = GroupCardParticipantDao.getGroupCardParticipants(
                             ran.nextLong(), db, travelerUserDao
                     );
                     assertTrue(list.isEmpty());
@@ -36,7 +34,7 @@ public class GroupCardParticipantDaoTest extends AbstractDaoTest {
     }
 
     @Test
-    public void getGroupCardParticipantss() {
+    public void getGroupCardParticipants() {
         Long groupCard = createUserWithGroupTravelCard("vit");
         Set<String> participants = new HashSet<>();
 
@@ -48,7 +46,7 @@ public class GroupCardParticipantDaoTest extends AbstractDaoTest {
                     participants.add(participant);
                 });
         assertTrue(participants.equals(
-                getGroupCardParticipants(groupCard, db, travelerUserDao)
+                GroupCardParticipantDao.getGroupCardParticipants(groupCard, db, travelerUserDao)
                     .stream().map( travelerUser -> travelerUser.getUsername())
                     .collect(Collectors.toSet())
         ));
@@ -66,7 +64,7 @@ public class GroupCardParticipantDaoTest extends AbstractDaoTest {
                     participants.add(participant);
                 });
         assertTrue(participants.equals(
-                getGroupCardParticipants(groupCard, db, travelerUserDao)
+                GroupCardParticipantDao.getGroupCardParticipants(groupCard, db, travelerUserDao)
                         .stream().map( travelerUser -> travelerUser.getUsername())
                         .collect(Collectors.toSet())
         ));

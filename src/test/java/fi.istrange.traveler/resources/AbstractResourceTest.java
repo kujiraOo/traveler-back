@@ -1,4 +1,4 @@
-package fi.istrange.traveler.resources.profile;
+package fi.istrange.traveler.resources;
 
 import com.bendb.dropwizard.jooq.JooqBundle;
 import fi.istrange.traveler.TravelerConfiguration;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by rohan on 4/26/17.
  */
-public class ResourceTest extends TestUtils{
+public class AbstractResourceTest extends TestUtils{
     protected static ApplicationBundle appBun = mock(ApplicationBundle.class);
     private static JooqBundle<TravelerConfiguration> jooqBundle = mock(JooqBundle.class);
 

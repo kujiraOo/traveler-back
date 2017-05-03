@@ -10,7 +10,31 @@ import static org.junit.Assert.*;
 public class ImageDaoTest {
 
     @Test
-    public void getImageBuffer() {
+    public void getImageBuffer01() {
+        // need method documentation
+        assertTrue(true);
+    }
+
+    @Test
+    public void getImageBuffer02() {
+        // need method documentation
+        assertTrue(true);
+    }
+
+    @Test
+    public void getImageBuffer03() {
+        // need method documentation
+        assertTrue(true);
+    }
+
+    @Test
+    public void getImageBuffer04() {
+        // need method documentation
+        assertTrue(true);
+    }
+
+    @Test
+    public void getImageBuffer05() {
         // need method documentation
         assertTrue(true);
     }
