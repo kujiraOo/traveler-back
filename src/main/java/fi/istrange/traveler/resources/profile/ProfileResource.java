@@ -57,8 +57,8 @@ public class ProfileResource {
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         participantDao = new GroupCardParticipantDao();
         customPersonalCardDao = new CustomCardDao();
-        userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
-        cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
+        cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
     }
 
     @GET
@@ -69,7 +69,7 @@ public class ProfileResource {
     ) {
         return UserProfileRes.fromEntity(
                 this.userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database)
         );
     }
 
@@ -124,8 +124,8 @@ public class ProfileResource {
                 .map(p -> PersonalCardRes.fromEntity(
                         p,
                         user,
-                        userPhotoDao.fetchByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchById(p.getId(), database)
+                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
                 ))
                 .collect(Collectors.toList());
     }
@@ -150,8 +150,8 @@ public class ProfileResource {
         return PersonalCardRes.fromEntity(
                 this.cardDao.fetchOneById(personalCardId),
                 userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database),
-                cardPhotoDao.fetchById(personalCardId, database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(personalCardId, database)
         );
     }
 
@@ -171,8 +171,8 @@ public class ProfileResource {
         return PersonalCardRes.fromEntity(
                 card,
                 userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database),
-                cardPhotoDao.fetchById(personalCardId, database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(personalCardId, database)
         );
     }
 
@@ -208,8 +208,8 @@ public class ProfileResource {
                         p,
                         participantDao.getGroupCardParticipants(p.getId(), database, userDAO),
                         userDAO.fetchOneByUsername(principal.getName()),
-                        userPhotoDao.fetchByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchById(p.getId(), database)
+                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
                 ))
                 .collect(Collectors.toList());
     }
@@ -231,8 +231,8 @@ public class ProfileResource {
                 cardDao.fetchOneById(cardId),
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
                 userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database),
-                cardPhotoDao.fetchById(cardId, database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
         );
     }
 
@@ -253,8 +253,8 @@ public class ProfileResource {
                 card,
                 participantDao.getGroupCardParticipants(cardId, database, userDAO),
                 userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database),
-                cardPhotoDao.fetchById(cardId, database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
         );
     }
 

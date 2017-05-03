@@ -40,8 +40,8 @@ public class MatchResource {
             ApplicationBundle applicationBundle
     ) {
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
-        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
     }
 
     /**
@@ -177,9 +177,9 @@ public class MatchResource {
                                                 userDAO.fetchOneByUsername(
                                                         pcRecord.get(Tables.CARD.OWNER_FK)
                                                 ),
-                                                userPhotoDao.fetchByUsername(pcRecord.get(Tables.CARD.OWNER_FK), db)
+                                                userPhotoDao.fetchPhotoOidByUsername(pcRecord.get(Tables.CARD.OWNER_FK), db)
                                         ),
-                                        cardPhotoDao.fetchById(pcRecord.get(Tables.CARD.ID), db)
+                                        cardPhotoDao.fetchPhotoOidByCardId(pcRecord.get(Tables.CARD.ID), db)
                                 )
                         )
                         .collect(Collectors.toList());
@@ -203,14 +203,14 @@ public class MatchResource {
                                         userDAO.fetchOneByUsername(
                                                 record.get(Tables.CARD.OWNER_FK)
                                         ),
-                                        userPhotoDao.fetchByUsername(record.get(Tables.CARD.OWNER_FK), db)
+                                        userPhotoDao.fetchPhotoOidByUsername(record.get(Tables.CARD.OWNER_FK), db)
                                 ),
                                 db.select().
                                         from(Tables.CARD_USER)
                                         .where(Tables.CARD_USER.CARD_ID.equal(
                                                 record.get(Tables.GROUP_CARD.ID)
                                         )).fetch(Tables.CARD_USER.USERNAME),
-                                cardPhotoDao.fetchById(record.get(Tables.CARD.ID), db)
+                                cardPhotoDao.fetchPhotoOidByCardId(record.get(Tables.CARD.ID), db)
                         )
                 ).collect(Collectors.toList());
     }

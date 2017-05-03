@@ -49,8 +49,8 @@ public class GroupCardResource {
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.participantDAO = new GroupCardParticipantDao();
         this.customGroupCardDao = new CustomCardDao();
-        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
-        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
     }
 
     @GET
@@ -69,8 +69,8 @@ public class GroupCardResource {
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),
                         userDAO.fetchOneByUsername(principal.getName()),
-                        userPhotoDao.fetchByUsername(principal.getName(), database),
-                        cardPhotoDao.fetchById(p.getId(), database)
+                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
                 )).collect(Collectors.toList());
     }
 
@@ -102,8 +102,8 @@ public class GroupCardResource {
                 cardDAO.fetchOneById(cardId),
                 participantDAO.getGroupCardParticipants(cardId, database, userDAO),
                 userDAO.fetchOneByUsername(principal.getName()),
-                userPhotoDao.fetchByUsername(principal.getName(), database),
-                cardPhotoDao.fetchById(cardId, database)
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
         );
     }
 

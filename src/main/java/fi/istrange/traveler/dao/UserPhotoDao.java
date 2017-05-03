@@ -2,10 +2,7 @@ package fi.istrange.traveler.dao;
 
 import fi.istrange.traveler.db.Tables;
 import fi.istrange.traveler.db.tables.pojos.GroupCard;
-import org.jooq.Configuration;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Result;
+import org.jooq.*;
 import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
@@ -21,13 +18,21 @@ import java.util.List;
  */
 public class UserPhotoDao {
 
-    private final Connection connection;
+    private final ConnectionProvider connectionProvider;
 
-    public UserPhotoDao(Configuration configuration) {
-        connection = configuration.connectionProvider().acquire();
+    public UserPhotoDao(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
 
-    public List<Long> fetchByUsername(
+    /**
+     * Get list of photo oids ever added to user identified by username by
+     * {@link #addPhoto(String, InputStream)}
+     * @param username
+     * @param database
+     * @return list of photo oids for given user, of
+     * empty list if given invalid userName
+     */
+    public List<Long> fetchPhotoOidByUsername(
             String username,
             DSLContext database
     ) {
@@ -39,8 +44,10 @@ public class UserPhotoDao {
                 );
     }
 
-    public void addPhoto(String username, InputStream uploadedPhotoStream) throws SQLException, IOException {
 
+    public long addPhoto(String username, InputStream uploadedPhotoStream) throws SQLException, IOException {
+
+        Connection connection = connectionProvider.acquire();
         // All LargeObject API calls must be within a transaction block
         connection.setAutoCommit(false);
 
@@ -75,12 +82,15 @@ public class UserPhotoDao {
 
             // Commit the transaction
             connection.commit();
+            return oid;
         } catch (Exception e) {
 
             // Rollback the transaction if saving of the photo failed
             connection.rollback();
 
             throw (e);
+        } finally {
+            connectionProvider.release(connection);
         }
     }
 }
