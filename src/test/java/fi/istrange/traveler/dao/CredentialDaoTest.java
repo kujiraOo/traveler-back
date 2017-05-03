@@ -20,7 +20,7 @@ public class CredentialDaoTest extends AbstractDaoTest {
 
     @Test
     public void fetchByUsername_empty() {
-        IntStream.range(0, 100).forEach(
+        IntStream.range(0, 2).forEach(
                 i -> assertFalse(fetchByUsername(String.valueOf(ran.nextLong()), db).isPresent())
         );
 
@@ -28,7 +28,7 @@ public class CredentialDaoTest extends AbstractDaoTest {
 
     @Test
     public void addUser() {
-        IntStream.range(0, 100).forEach(
+        IntStream.range(0, 2).forEach(
             i -> {
                 createUser(String.valueOf(i), Date.valueOf("2015-10-10"), "gay");
                 CredentialDao.addUser(String.valueOf(i), "youShallNotPass", db);
@@ -41,7 +41,7 @@ public class CredentialDaoTest extends AbstractDaoTest {
 
     @Test
     public void deactivateUser() {
-        IntStream.range(0, 100).forEach(
+        IntStream.range(0, 2).forEach(
                 i -> {
                     String userName = String.valueOf(i);
                     createUser(userName, Date.valueOf("2015-10-10"), "gay");

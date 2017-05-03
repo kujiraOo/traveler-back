@@ -22,7 +22,7 @@ public class GroupCardParticipantDaoTest extends AbstractDaoTest {
 
     private TravelerUserDao travelerUserDao = new TravelerUserDao(configuration);
     private Random ran = new Random();
-    private final int TEST_ITERATION = 30;
+    private final int TEST_ITERATION = 2;
 
     @Test
     public void getGroupCardParticipantss_invalidCardId() {

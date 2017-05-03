@@ -16,7 +16,7 @@ public class CustomCardDaoTest extends AbstractDaoTest {
 
     Random ran = new Random();
 
-    private static final int TEST_ITERATION = 30;
+    private static final int TEST_ITERATION = 2;
 
     @Test
     public void isPersonalTravelCard_returnFalse() {

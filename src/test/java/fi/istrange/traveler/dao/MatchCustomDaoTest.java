@@ -123,12 +123,12 @@ public class MatchCustomDaoTest extends AbstractDaoTest {
     }
 
     private Random ran = new Random();
-    private final int INTERATION = 30;
+    private final int TEST_ITERATION = 2;
 
     private Set<Long> createCard(Long matched, Function<String, Long> register) {
         Set<Long> expectedId = new HashSet<>();
         Set<String> usedUsername = new HashSet<>();
-        for(int i = 0; i < INTERATION; i++) {
+        for(int i = 0; i < TEST_ITERATION; i++) {
             String userName = String.valueOf(ran.nextInt());
             if(!usedUsername.contains(userName)) {
                 usedUsername.add(userName);
