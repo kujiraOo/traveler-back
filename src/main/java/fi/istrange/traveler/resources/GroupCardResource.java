@@ -82,12 +82,13 @@ public class GroupCardResource {
             GroupCardCreationReq groupCardCreationReq,
             @Context DSLContext database
     ) {
-        cardDAO.insert(fromCreateReq(groupCardCreationReq, principal.getName()));
-        groupCardDAO.insert(new GroupCard(groupCardCreationReq.getId()));
+        Long cardId = cardDAO.count() + 1;
+        cardDAO.insert(fromCreateReq(cardId, groupCardCreationReq, principal.getName()));
+        groupCardDAO.insert(new GroupCard(cardId));
         groupCardCreationReq.getParticipants()
-                .forEach(p -> participantDAO.addGroupCardParticipant(groupCardCreationReq.getId(), p, database));
+                .forEach(p -> participantDAO.addGroupCardParticipant(cardId, p, database));
 
-        return getGroupCard(principal, groupCardCreationReq.getId(), database);
+        return getGroupCard(principal, cardId, database);
     }
 
     @GET
@@ -107,9 +108,9 @@ public class GroupCardResource {
         );
     }
 
-    private static Card fromCreateReq(GroupCardCreationReq req, String username) {
+    private static Card fromCreateReq(Long cardId, GroupCardCreationReq req, String username) {
         return new Card(
-                req.getId(),
+                cardId,
                 req.getStartTime(),
                 req.getEndTime(),
                 req.getLon(),
