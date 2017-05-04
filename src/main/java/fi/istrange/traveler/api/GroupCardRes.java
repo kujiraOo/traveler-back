@@ -26,10 +26,11 @@ public class GroupCardRes extends CardRes {
         BigDecimal lon,
         BigDecimal lat,
         UserProfileRes owner,
+        Boolean active,
         List<String> participants,
         List<Long> photos
     ) {
-        super(id, title, description, startTime, endTime, lon, lat, owner, photos);
+        super(id, title, description, startTime, endTime, lon, lat, owner, active, photos);
         this.participants = participants;
     }
 
@@ -54,6 +55,7 @@ public class GroupCardRes extends CardRes {
                 card.getLon(),
                 card.getLat(),
                 UserProfileRes.fromEntity(owner, userPhotos),
+                card.getActive(),
                 participants.stream()
                         .map(p -> p.getUsername())
                         .collect(Collectors.toList()),

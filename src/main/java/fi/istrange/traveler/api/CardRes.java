@@ -3,6 +3,7 @@ package fi.istrange.traveler.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -20,6 +21,7 @@ public class CardRes {
     private BigDecimal lon;
     private BigDecimal lat;
     private UserProfileRes owner;
+    private Boolean active;
     private List<Long> photos;
 
     public CardRes(
@@ -31,6 +33,7 @@ public class CardRes {
         BigDecimal lon,
         BigDecimal lat,
         UserProfileRes owner,
+        Boolean active,
         List<Long> photos
     ) {
         this.id = id;
@@ -41,6 +44,7 @@ public class CardRes {
         this.lon = lon;
         this.lat = lat;
         this.owner = owner;
+        this.active = active;
         this.photos = photos;
     }
 
@@ -78,6 +82,11 @@ public class CardRes {
     @JsonProperty
     public UserProfileRes getOwner() {
         return owner;
+    }
+
+    @JsonProperty
+    public Boolean getActive() {
+        return active;
     }
 
     @JsonProperty

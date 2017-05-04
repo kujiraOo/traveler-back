@@ -1,9 +1,11 @@
 package fi.istrange.traveler.util;
 
 import fi.istrange.traveler.db.Tables;
+import liquibase.logging.core.DefaultLoggerConfiguration;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.junit.After;
@@ -21,21 +23,12 @@ import static fi.istrange.traveler.db.Tables.*;
  * Created by rohan on 4/25/17.
  */
 public class TestUtils {
-    public static void deleteAllTablesContent(DSLContext db) {
-        db.delete(Tables.USER_PHOTO).execute();
-        db.delete(Tables.CARD_PHOTO).execute();
-        db.delete(Tables.PERSONAL_CARD).execute();
-        db.delete(Tables.CARD_USER).execute();
-        db.delete(Tables.GROUP_CARD).execute();
-        db.delete(Tables.MATCH).execute();
-        db.delete(CARD).execute();
-        db.delete(Tables.USER_CREDENTIALS).execute();
-        db.delete(Tables.TRAVELER_USER).execute();
-    }
-
     protected static Connection conn;
     protected static DSLContext db;
     protected static Configuration configuration;
+    private static final String userName = "postgres";
+    private static final String password = "";
+    private static final String url = "jdbc:postgresql://127.0.0.1:5032/traveler";
 
     @BeforeClass
     public static void setUp() {
@@ -43,6 +36,7 @@ public class TestUtils {
         db = getDSLContext();
         configuration = new DefaultConfiguration();
         configuration.set(conn);
+        configuration.set(SQLDialect.POSTGRES_9_5);
     }
 
     @AfterClass
@@ -64,9 +58,17 @@ public class TestUtils {
         deleteAllTablesContent(db);
     }
 
-    private static final String userName = "postgres";
-    private static final String password = "";
-    private static final String url = "jdbc:postgresql://127.0.0.1:5032/traveler";
+    public static void deleteAllTablesContent(DSLContext db) {
+        db.delete(Tables.USER_PHOTO).execute();
+        db.delete(Tables.CARD_PHOTO).execute();
+        db.delete(Tables.PERSONAL_CARD).execute();
+        db.delete(Tables.CARD_USER).execute();
+        db.delete(Tables.GROUP_CARD).execute();
+        db.delete(Tables.MATCH).execute();
+        db.delete(CARD).execute();
+        db.delete(Tables.USER_CREDENTIALS).execute();
+        db.delete(Tables.TRAVELER_USER).execute();
+    }
 
     private static Connection getDatabaseConnection() {
         try {
@@ -137,6 +139,34 @@ public class TestUtils {
                 Tables.TRAVELER_USER,
                 TRAVELER_USER.USERNAME, TRAVELER_USER.BIRTH, TRAVELER_USER.GENDER
         ).values(userName, birthDate, sex).execute();
+    }
+
+    protected void createUser(
+            String userName,
+            String lastName,
+            String firstName,
+            String email,
+            String phone,
+            String address,
+            String city,
+            String country,
+            Date birthDate,
+            String sex
+    ) {
+        db.insertInto(
+                Tables.TRAVELER_USER,
+                TRAVELER_USER.USERNAME,
+                TRAVELER_USER.LAST_NAME,
+                TRAVELER_USER.FIRST_NAME,
+                TRAVELER_USER.EMAIL,
+                TRAVELER_USER.PHONE,
+                TRAVELER_USER.ADDRESS,
+                TRAVELER_USER.CITY,
+                TRAVELER_USER.COUNTRY,
+                TRAVELER_USER.BIRTH,
+                TRAVELER_USER.GENDER
+        ).values(userName, lastName, firstName, email, phone, address, city, country, birthDate, sex)
+                .execute();
     }
 
     protected Long createPersonalTravelCardForUser(
@@ -214,6 +244,5 @@ public class TestUtils {
         db.insertInto(Tables.CARD_USER, CARD_USER.USERNAME, CARD_USER.CARD_ID)
                 .values(userName, groupCardId).execute();
     }
-
 
 }

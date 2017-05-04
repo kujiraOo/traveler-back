@@ -24,9 +24,10 @@ public class PersonalCardRes extends CardRes {
         @JsonProperty("lon") BigDecimal lon,
         @JsonProperty("lat") BigDecimal lat,
         @JsonProperty("owner") UserProfileRes owner,
+        @JsonProperty("active") Boolean active,
         @JsonProperty("photos") List<Long> photos
     ) {
-        super(id, title, description, startTime, endTime, lon, lat, owner, photos);
+        super(id, title, description, startTime, endTime, lon, lat, owner, active, photos);
     }
 
     public static PersonalCardRes fromEntity(
@@ -44,7 +45,10 @@ public class PersonalCardRes extends CardRes {
                 card.getLon(),
                 card.getLat(),
                 UserProfileRes.fromEntity(user, userPhotos),
+                card.getActive(),
                 cardPhotos
         );
     }
+
+
 }
