@@ -1,7 +1,15 @@
 #!/bin/bash
-SERVICE_NAME="flask-signup-service"
 IMAGE_VERSION="v_"${TRAVIS_BUILD_NUMBER}
-TASK_FAMILY="flask-signup"
+
+if [ "$TRAVIS_BRANCH" == "development" ]; then
+    SERVICE_NAME="flask-signup-service"
+    TASK_FAMILY="flask-signup"
+    TASK_DEF_TEMPLATE="flask-signup.json"
+elif [ "$TRAVIS_BRANCH" == "master" ]; then
+    SERVICE_NAME="traveler-back"
+    TASK_FAMILY="flask-signup"
+    TASK_DEF_TEMPLATE="traveler-back-task-def.json"
+fi
 
 TASK_REVISION=`aws ecs describe-task-definition --task-definition flask-signup | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/"$//' | sed 's/,$//'`
 ((OLD_TASK = TASK_REVISION - 0))
@@ -12,7 +20,7 @@ echo ${OLD_TASK_ID}
 aws ecs stop-task --task ${OLD_TASK_ID}
 
 # Create a new task definition for this build
-sed -e "s;%BUILD_NUMBER%;${TRAVIS_BUILD_NUMBER};g" flask-signup.json > flask-signup-v_${TRAVIS_BUILD_NUMBER}.json
+sed -e "s;%BUILD_NUMBER%;${TRAVIS_BUILD_NUMBER};g" ${TASK_DEF_TEMPLATE} > flask-signup-v_${TRAVIS_BUILD_NUMBER}.json
 ls
 aws ecs --version
 aws ecs register-task-definition --family flask-signup --cli-input-json file://flask-signup-v_${TRAVIS_BUILD_NUMBER}.json

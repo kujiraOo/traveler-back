@@ -6,18 +6,24 @@ services:
   - docker
 
 before_install:
+  - scripts/env_setup.sh
   - pip install --user awscli
   - aws ecs describe-task-definition --task-definition flask-signup | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/"$//' | sed 's/,$//'
   - docker run --name traveler-db -e POSTGRES_DB=traveler -P -p 5032:5432 -d alekster/traveler-db
 
 after_success:
-  - scripts/staging/docker_push.sh
-
+  - scripts/docker_push.sh
 
 deploy:
   # deploy develop to the staging environment
   - provider: script
     skip_cleanup: true
-    script: scripts/staging/deploy.sh
+    script: scripts/deploy.sh
     on:
       branch: development
+  # deploy master to the production environment
+  - provides: script
+    skip_cleanup: true
+    script: scripts/deploy.sh
+    on:
+      branch: master
