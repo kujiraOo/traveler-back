@@ -1,26 +1,28 @@
 package fi.istrange.traveler;
 
+import fi.istrange.traveler.bundle.ApplicationBundle;
+import fi.istrange.traveler.resources.*;
+import fi.istrange.traveler.resources.profile.MatchResource;
+import fi.istrange.traveler.resources.profile.ProfileResource;
 import io.dropwizard.Application;
+import io.dropwizard.Configuration;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.configuration.*;
-import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.migrations.MigrationsBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
-import fi.istrange.traveler.bundle.ApplicationBundle;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
+import org.dhatim.dropwizard.jwt.cookie.authentication.JwtCookieAuthBundle;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
-import javax.inject.Inject;
 /**
  * Created by aleksandr on 26.3.2017.
  */
 public class TravelerApplication extends Application<TravelerConfiguration> {
     private ApplicationBundle applicationBundle;
-
-    private ServiceLocator serviceLocator;
 
     public static void main(final String[] args) throws Exception {
         new TravelerApplication().run(args);
@@ -30,7 +32,14 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
     public void run(TravelerConfiguration configuration, Environment environment) {
         applicationBundle.setConfiguration(configuration);
 
-        // TODO: add Jersey resources here
+        environment.jersey().register(MultiPartFeature.class);
+        environment.jersey().register(new AuthResource());
+        environment.jersey().register(new PersonalCardResource(applicationBundle));
+        environment.jersey().register(new GroupCardResource(applicationBundle));
+        environment.jersey().register(new UserResource(applicationBundle));
+        environment.jersey().register(new ProfileResource(applicationBundle));
+        environment.jersey().register(new ImageResource(applicationBundle));
+        environment.jersey().register(new MatchResource(applicationBundle));
     }
 
     @Override
@@ -41,7 +50,7 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
                         bootstrap.getConfigurationSourceProvider(),
-                        new EnvironmentVariableSubstitutor(false)
+                        new EnvironmentVariableSubstitutor()
                 )
         );
 
@@ -60,7 +69,11 @@ public class TravelerApplication extends Application<TravelerConfiguration> {
                 return portalConfiguration.getSwaggerBundleConfiguration();
             }
         });
-        // remove the commets when the actual DB can be instantiated
-        // bootstrap.addBundle(applicationBundle.getJooqBundle());
+
+
+        bootstrap.addBundle(JwtCookieAuthBundle.getDefault().withConfigurationSupplier((Configuration configuration) ->
+                ((TravelerConfiguration) configuration).getJwtCookieAuth()));
+
+        bootstrap.addBundle(applicationBundle.getJooqBundle());
     }
 }

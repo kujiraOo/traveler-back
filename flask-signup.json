@@ -1,0 +1,34 @@
+{
+    "family": "flask-signup",
+    "containerDefinitions": [
+        {
+          "environment": [
+            {
+              "name": "POSTGRES_DB",
+              "value": "traveler"
+            }
+          ],
+          "name": "flask-signup-db",
+          "image": "alekster/traveler-db:latest",
+          "cpu": 10,
+          "memory": 256,
+          "essential": false
+        },
+        {
+            "image": "alekster/traveler:v_%BUILD_NUMBER%",
+            "name": "flask-signup",
+            "links": [
+              "flask-signup-db:CUSTOM_ALIAS"
+            ],
+            "cpu": 10,
+            "memory": 256,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 8070
+                }
+            ]
+        }
+    ]
+}
