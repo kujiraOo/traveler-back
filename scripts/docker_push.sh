@@ -6,13 +6,15 @@ pip install --user awscli
 export PATH=$PATH:$HOME/.local/bin
 eval $(aws ecr get-login --region $AWS_DEFAULT_REGION)
 
+echo "\$DOCKER_USERNAME=" $DOCKER_USERNAME
+
 # Login to docker
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 # Push only if it's not a pull request
 if [ -z "$TRAVIS_PULL_REQUEST" ] || [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   # Push only if we're testing the master branch
-  if [ "$TRAVIS_BRANCH" == "development" ]; then
+  if [ "$TRAVIS_BRANCH" == "development" ] || [ "$TRAVIS_BRANCH" == "master" ]; then
 
     # Build and push
     docker build -t $IMAGE_NAME .
@@ -21,7 +23,7 @@ if [ -z "$TRAVIS_PULL_REQUEST" ] || [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     docker push "$REMOTE_IMAGE_URL:v_$TRAVIS_BUILD_NUMBER"
     echo "Pushed $IMAGE_NAME:v_$TRAVIS_BUILD_NUMBER"
   else
-    echo "Skipping deploy because branch is not 'development'"
+    echo "Skipping deploy because branch is not 'development' or 'master'"
   fi
 else
   echo "Skipping deploy because it's a pull request"
