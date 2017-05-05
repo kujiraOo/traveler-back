@@ -4,6 +4,7 @@
 
 if [ "$TRAVIS_BRANCH" == "development" ]; then
     echo "Setting up staging env vars"
+    echo $STAGING_DOCKER_USERNAME
     export AWS_ACCESS_KEY_ID=$STAGING_AWS_ACCESS_KEY_ID
     export AWS_SECRET_ACCESS_KEY=$STAGING_AWS_SECRET_ACCESS_KEY
     export DOCKER_USERNAME=$STAGING_DOCKER_USERNAME
