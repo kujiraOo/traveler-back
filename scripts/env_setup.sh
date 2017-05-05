@@ -22,3 +22,5 @@ elif [ "$TRAVIS_BRANCH" == "master" ]; then
 else
     echo "Skipping env vars setup because branch is not 'development' or 'master'"
 fi
+
+echo "\$DOCKER_USERNAME=" $DOCKER_USERNAME
