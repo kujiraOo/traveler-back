@@ -4,11 +4,15 @@
 package fi.istrange.traveler.db;
 
 
+import fi.istrange.traveler.db.tables.Card;
+import fi.istrange.traveler.db.tables.CardPhoto;
 import fi.istrange.traveler.db.tables.CardUser;
 import fi.istrange.traveler.db.tables.GroupCard;
+import fi.istrange.traveler.db.tables.Match;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
+import fi.istrange.traveler.db.tables.UserPhoto;
 
 import javax.annotation.Generated;
 
@@ -27,6 +31,16 @@ import javax.annotation.Generated;
 public class Tables {
 
     /**
+     * The table <code>public.card</code>.
+     */
+    public static final Card CARD = fi.istrange.traveler.db.tables.Card.CARD;
+
+    /**
+     * The table <code>public.card_photo</code>.
+     */
+    public static final CardPhoto CARD_PHOTO = fi.istrange.traveler.db.tables.CardPhoto.CARD_PHOTO;
+
+    /**
      * The table <code>public.card_user</code>.
      */
     public static final CardUser CARD_USER = fi.istrange.traveler.db.tables.CardUser.CARD_USER;
@@ -35,6 +49,11 @@ public class Tables {
      * The table <code>public.group_card</code>.
      */
     public static final GroupCard GROUP_CARD = fi.istrange.traveler.db.tables.GroupCard.GROUP_CARD;
+
+    /**
+     * The table <code>public.match</code>.
+     */
+    public static final Match MATCH = fi.istrange.traveler.db.tables.Match.MATCH;
 
     /**
      * The table <code>public.personal_card</code>.
@@ -50,4 +69,9 @@ public class Tables {
      * The table <code>public.user_credentials</code>.
      */
     public static final UserCredentials USER_CREDENTIALS = fi.istrange.traveler.db.tables.UserCredentials.USER_CREDENTIALS;
+
+    /**
+     * The table <code>public.user_photo</code>.
+     */
+    public static final UserPhoto USER_PHOTO = fi.istrange.traveler.db.tables.UserPhoto.USER_PHOTO;
 }

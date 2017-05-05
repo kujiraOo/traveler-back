@@ -2,12 +2,12 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.GroupCardCreationReq;
 import fi.istrange.traveler.api.GroupCardRes;
-import fi.istrange.traveler.api.GroupCardUpdateReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.GroupCardCustomDao;
-import fi.istrange.traveler.dao.GroupCardParticipantDao;
+import fi.istrange.traveler.dao.*;
+import fi.istrange.traveler.db.tables.daos.CardDao;
 import fi.istrange.traveler.db.tables.daos.GroupCardDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
+import fi.istrange.traveler.db.tables.pojos.Card;
 import fi.istrange.traveler.db.tables.pojos.GroupCard;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -33,18 +33,24 @@ import java.util.stream.Collectors;
 @Api(value = "/group-cards", tags = "group cards")
 @PermitAll
 public class GroupCardResource {
-    private final GroupCardDao cardDAO;
-    private final GroupCardCustomDao customGroupCardDao;
+    private final CardDao cardDAO;
+    private final GroupCardDao groupCardDAO;
+    private final CustomCardDao customGroupCardDao;
     private final TravelerUserDao userDAO;
     private final GroupCardParticipantDao participantDAO;
+    private final UserPhotoDao userPhotoDao;
+    private final CardPhotoDao cardPhotoDao;
 
     public GroupCardResource(
             ApplicationBundle applicationBundle
     ) {
-        this.cardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.cardDAO = new CardDao(applicationBundle.getJooqBundle().getConfiguration());
+        this.groupCardDAO = new GroupCardDao(applicationBundle.getJooqBundle().getConfiguration());
         this.userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
         this.participantDAO = new GroupCardParticipantDao();
-        this.customGroupCardDao = new GroupCardCustomDao();
+        this.customGroupCardDao = new CustomCardDao();
+        this.userPhotoDao = new UserPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
+        this.cardPhotoDao = new CardPhotoDao(applicationBundle.getJooqBundle().getConfiguration().connectionProvider());
     }
 
     @GET
@@ -57,12 +63,15 @@ public class GroupCardResource {
             @QueryParam("offset") @DefaultValue("0") int offset,
             @Context DSLContext database
     ) {
-        return customGroupCardDao.fetchByPosition(lat, lng, includeArchived, offset, database)
+        return customGroupCardDao.fetchByPosition(CardType.GROUP, lat, lng, includeArchived, offset, database)
                 .stream()
+                .filter(p -> !p.getOwnerFk().equals(principal.getName()))
                 .map(p -> GroupCardRes.fromEntity(
                         p,
                         participantDAO.getGroupCardParticipants(p.getId(), database, userDAO),
-                        principal.getName()
+                        userDAO.fetchOneByUsername(principal.getName()),
+                        userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                        cardPhotoDao.fetchPhotoOidByCardId(p.getId(), database)
                 )).collect(Collectors.toList());
     }
 
@@ -74,11 +83,13 @@ public class GroupCardResource {
             GroupCardCreationReq groupCardCreationReq,
             @Context DSLContext database
     ) {
-        cardDAO.insert(fromCreateReq(groupCardCreationReq, principal.getName()));
+        Long cardId = cardDAO.count() + 1;
+        cardDAO.insert(fromCreateReq(cardId, groupCardCreationReq, principal.getName()));
+        groupCardDAO.insert(new GroupCard(cardId));
         groupCardCreationReq.getParticipants()
-                .forEach(p -> participantDAO.addGroupCardParticipant(groupCardCreationReq.getId(), p, database));
+                .forEach(p -> participantDAO.addGroupCardParticipant(cardId, p, database));
 
-        return getGroupCard(principal, groupCardCreationReq.getId(), database);
+        return getGroupCard(principal, cardId, database);
     }
 
     @GET
@@ -92,64 +103,23 @@ public class GroupCardResource {
         return GroupCardRes.fromEntity(
                 cardDAO.fetchOneById(cardId),
                 participantDAO.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName()
+                userDAO.fetchOneByUsername(principal.getName()),
+                userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
+                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
         );
     }
 
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
-    @ApiOperation("Update a group travel card by id")
-    public GroupCardRes updateGroupCard(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long cardId,
-            GroupCardUpdateReq groupCardUpdateReq,
-            @Context DSLContext database
-    ) {
-        cardDAO.update(fromUpdateReq(groupCardUpdateReq, cardDAO.fetchOneById(cardId)));
-        participantDAO.updateGroupCardParticipants(cardId, groupCardUpdateReq.getParticipants(), database);
-
-        return getGroupCard(principal, cardId, database);
-    }
-
-    @DELETE
-    @Path("/{id}")
-    @ApiOperation("Archive a group travel card by id")
-    public GroupCardRes deactivateGroupCard(
-            @ApiParam(hidden = true) @Auth DefaultJwtCookiePrincipal principal,
-            @PathParam("id") long cardId,
-            @Context DSLContext database
-    ) {
-        GroupCard card = cardDAO.fetchOneById(cardId);
-
-        card.setActive(false);
-        cardDAO.update(card);
-
-        return GroupCardRes.fromEntity(
-                card,
-                participantDAO.getGroupCardParticipants(cardId, database, userDAO),
-                principal.getName()
-        );
-    }
-
-    private static GroupCard fromCreateReq(GroupCardCreationReq req, String username) {
-        return new GroupCard(
-                req.getId(),
+    private static Card fromCreateReq(Long cardId, GroupCardCreationReq req, String username) {
+        return new Card(
+                cardId,
                 req.getStartTime(),
                 req.getEndTime(),
                 req.getLon(),
                 req.getLat(),
                 username,
-                true
+                true,
+                req.getTitle(),
+                req.getDescription()
         );
-    }
-
-    private static GroupCard fromUpdateReq(GroupCardUpdateReq req, GroupCard card) {
-        card.setStartTime(req.getStartTime());
-        card.setEndTime(req.getEndTime());
-        card.setLon(req.getLon());
-        card.setLat(req.getLat());
-
-        return card;
     }
 }

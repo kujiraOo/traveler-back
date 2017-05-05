@@ -15,13 +15,15 @@ public class GroupCardUpdateReq extends CardUpdateReq {
 
     @JsonCreator
     public GroupCardUpdateReq(
+            @JsonProperty("title") String title,
+            @JsonProperty("description") String description,
             @JsonProperty("startTime") Date startTime,
             @JsonProperty("endTime") Date endTime,
             @JsonProperty("lon") BigDecimal lon,
             @JsonProperty("lat") BigDecimal lat,
             @JsonProperty("participants") List<String> participants
     ) {
-        super(startTime, endTime, lon, lat);
+        super(title, description, startTime, endTime, lon, lat);
         this.participants = participants;
     }
 

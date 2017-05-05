@@ -14,14 +14,16 @@ public class GroupCardCreationReq extends CardCreationReq {
 
     @JsonCreator
     public GroupCardCreationReq(
-            @JsonProperty("id") Long id,
+            // @JsonProperty("id") Long id,
+            @JsonProperty("title") String title,
+            @JsonProperty("description") String description,
             @JsonProperty("startTime") java.sql.Date startTime,
             @JsonProperty("endTime") java.sql.Date endTime,
             @JsonProperty("lon") BigDecimal lon,
             @JsonProperty("lat") BigDecimal lat,
             @JsonProperty("participants") List<String> participants
     ) {
-        super(id, startTime, endTime, lon, lat);
+        super(title, description, startTime, endTime, lon, lat);
         this.participants = participants;
     }
 

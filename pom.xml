@@ -64,9 +64,15 @@
     <properties>
         <dropwizard.version>1.0.6</dropwizard.version>
         <postgres.version>9.4.1212</postgres.version>
+        <skipTests>false</skipTests>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-testing</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -90,9 +96,22 @@
         </dependency>
 
         <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-forms</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.smoketurner</groupId>
             <artifactId>dropwizard-swagger</artifactId>
             <version>1.0.0-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -100,6 +119,7 @@
             <artifactId>dropwizard-jooq</artifactId>
             <version>1.0.0-2</version>
         </dependency>
+
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jool</artifactId>
@@ -120,6 +140,11 @@
             <artifactId>javax.websocket-api</artifactId>
             <version>1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -131,6 +156,14 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <version>2.12.4</version>
+              <configuration>
+                <skipTests>${skipTests}</skipTests>
+              </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

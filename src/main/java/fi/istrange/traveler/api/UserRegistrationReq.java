@@ -17,7 +17,6 @@ public class UserRegistrationReq {
     private String address;
     private String city;
     private String country;
-    private Long   photo;
     private String firstName;
     private String lastName;
     private String password;
@@ -33,7 +32,6 @@ public class UserRegistrationReq {
             @JsonProperty("address")String address,
             @JsonProperty("city")String city,
             @JsonProperty("country") String country,
-            @JsonProperty("photo")Long   photo,
             @JsonProperty("firstName")String firstName,
             @JsonProperty("lastName")String lastName
     ) {
@@ -46,7 +44,6 @@ public class UserRegistrationReq {
         this.address = address;
         this.city = city;
         this.country = country;
-        this.photo = photo;
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -121,14 +118,6 @@ public class UserRegistrationReq {
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    public Long getPhoto() {
-        return this.photo;
-    }
-
-    public void setPhoto(Long photo) {
-        this.photo = photo;
     }
 
     public String getFirstName() {

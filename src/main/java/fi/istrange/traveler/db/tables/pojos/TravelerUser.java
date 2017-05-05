@@ -4,10 +4,11 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
-import java.io.Serializable;
-import java.sql.Date;
+import com.google.common.base.Objects;
 
 import javax.annotation.Generated;
+import java.io.Serializable;
+import java.sql.Date;
 
 
 /**
@@ -23,7 +24,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TravelerUser implements Serializable {
 
-    private static final long serialVersionUID = -2010630712;
+    private static final long serialVersionUID = -1141615582;
 
     private String username;
     private Date   birth;
@@ -33,7 +34,6 @@ public class TravelerUser implements Serializable {
     private String address;
     private String city;
     private String country;
-    private Long   photo;
     private String firstName;
     private String lastName;
 
@@ -48,7 +48,6 @@ public class TravelerUser implements Serializable {
         this.address = value.address;
         this.city = value.city;
         this.country = value.country;
-        this.photo = value.photo;
         this.firstName = value.firstName;
         this.lastName = value.lastName;
     }
@@ -62,7 +61,6 @@ public class TravelerUser implements Serializable {
         String address,
         String city,
         String country,
-        Long   photo,
         String firstName,
         String lastName
     ) {
@@ -74,7 +72,6 @@ public class TravelerUser implements Serializable {
         this.address = address;
         this.city = city;
         this.country = country;
-        this.photo = photo;
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -143,14 +140,6 @@ public class TravelerUser implements Serializable {
         this.country = country;
     }
 
-    public Long getPhoto() {
-        return this.photo;
-    }
-
-    public void setPhoto(Long photo) {
-        this.photo = photo;
-    }
-
     public String getFirstName() {
         return this.firstName;
     }
@@ -179,11 +168,32 @@ public class TravelerUser implements Serializable {
         sb.append(", ").append(address);
         sb.append(", ").append(city);
         sb.append(", ").append(country);
-        sb.append(", ").append(photo);
         sb.append(", ").append(firstName);
         sb.append(", ").append(lastName);
 
         sb.append(")");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TravelerUser that = (TravelerUser) o;
+        return Objects.equal(username, that.username) &&
+                Objects.equal(birth, that.birth) &&
+                Objects.equal(gender, that.gender) &&
+                Objects.equal(email, that.email) &&
+                Objects.equal(phone, that.phone) &&
+                Objects.equal(address, that.address) &&
+                Objects.equal(city, that.city) &&
+                Objects.equal(country, that.country) &&
+                Objects.equal(firstName, that.firstName) &&
+                Objects.equal(lastName, that.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(username, birth, gender, email, phone, address, city, country, firstName, lastName);
     }
 }

@@ -2,7 +2,7 @@ package fi.istrange.traveler.resources;
 
 import fi.istrange.traveler.api.UserRegistrationReq;
 import fi.istrange.traveler.bundle.ApplicationBundle;
-import fi.istrange.traveler.dao.UserCredentialDao;
+import fi.istrange.traveler.dao.CredentialDao;
 import fi.istrange.traveler.db.tables.daos.TravelerUserDao;
 import fi.istrange.traveler.db.tables.pojos.TravelerUser;
 import io.dropwizard.auth.Auth;
@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.dhatim.dropwizard.jwt.cookie.authentication.DefaultJwtCookiePrincipal;
 import org.jooq.DSLContext;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -26,14 +27,14 @@ import javax.ws.rs.core.Response;
 @Api(value = "/users", tags = "users")
 public class UserResource {
     private final TravelerUserDao userDAO;
-    private final UserCredentialDao credentialDao;
+    private final CredentialDao credentialDao;
 
     @Inject
     public UserResource(
             ApplicationBundle applicationBundle
     ) {
         userDAO = new TravelerUserDao(applicationBundle.getJooqBundle().getConfiguration());
-        credentialDao = new UserCredentialDao();
+        credentialDao = new CredentialDao();
     }
 
     @POST
@@ -44,7 +45,10 @@ public class UserResource {
             @Context DSLContext database
     ) {
         userDAO.insert(fromRegisterReq(newUser));
-        credentialDao.addUser(newUser.getUsername(), newUser.getPassword(), database);
+
+        String hashedPassword = BCrypt.hashpw(newUser.getPassword(), BCrypt.gensalt());
+
+        credentialDao.addUser(newUser.getUsername(), hashedPassword, database);
 
         return Response.accepted().build();
     }
@@ -69,8 +73,7 @@ public class UserResource {
                 req.getPhone(),
                 req.getAddress(),
                 req.getCity(),
-                req.getCountry(),
-                req.getPhoto(),
+                req.getCountry(), //TODO: save photo somewhere else
                 req.getFirstName(),
                 req.getLastName()
         );

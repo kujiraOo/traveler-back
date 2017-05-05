@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TravelerUser extends TableImpl<TravelerUserRecord> {
 
-    private static final long serialVersionUID = -1968376094;
+    private static final long serialVersionUID = 539079983;
 
     /**
      * The reference instance of <code>public.traveler_user</code>
@@ -83,11 +83,6 @@ public class TravelerUser extends TableImpl<TravelerUserRecord> {
      * The column <code>public.traveler_user.country</code>.
      */
     public final TableField<TravelerUserRecord, String> COUNTRY = createField("country", org.jooq.impl.SQLDataType.VARCHAR.length(80), this, "");
-
-    /**
-     * The column <code>public.traveler_user.photo</code>.
-     */
-    public final TableField<TravelerUserRecord, Long> PHOTO = createField("photo", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.traveler_user.first_name</code>.

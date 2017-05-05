@@ -4,10 +4,9 @@
 package fi.istrange.traveler.db.tables.pojos;
 
 
-import javax.annotation.Generated;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Date;
+
+import javax.annotation.Generated;
 
 
 /**
@@ -23,44 +22,20 @@ import java.sql.Date;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonalCard implements Serializable {
 
-    private static final long serialVersionUID = -1832066599;
+    private static final long serialVersionUID = -230748044;
 
-    private Long       id;
-    private Date       startTime;
-    private Date       endTime;
-    private BigDecimal lon;
-    private BigDecimal lat;
-    private String     usernameFk;
-    private Boolean    active;
+    private Long id;
 
     public PersonalCard() {}
 
     public PersonalCard(PersonalCard value) {
         this.id = value.id;
-        this.startTime = value.startTime;
-        this.endTime = value.endTime;
-        this.lon = value.lon;
-        this.lat = value.lat;
-        this.usernameFk = value.usernameFk;
-        this.active = value.active;
     }
 
     public PersonalCard(
-        Long       id,
-        Date       startTime,
-        Date       endTime,
-        BigDecimal lon,
-        BigDecimal lat,
-        String     usernameFk,
-        Boolean    active
+        Long id
     ) {
         this.id = id;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.lon = lon;
-        this.lat = lat;
-        this.usernameFk = usernameFk;
-        this.active = active;
     }
 
     public Long getId() {
@@ -71,65 +46,11 @@ public class PersonalCard implements Serializable {
         this.id = id;
     }
 
-    public Date getStartTime() {
-        return this.startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return this.endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public BigDecimal getLon() {
-        return this.lon;
-    }
-
-    public void setLon(BigDecimal lon) {
-        this.lon = lon;
-    }
-
-    public BigDecimal getLat() {
-        return this.lat;
-    }
-
-    public void setLat(BigDecimal lat) {
-        this.lat = lat;
-    }
-
-    public String getUsernameFk() {
-        return this.usernameFk;
-    }
-
-    public void setUsernameFk(String usernameFk) {
-        this.usernameFk = usernameFk;
-    }
-
-    public Boolean getActive() {
-        return this.active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("PersonalCard (");
 
         sb.append(id);
-        sb.append(", ").append(startTime);
-        sb.append(", ").append(endTime);
-        sb.append(", ").append(lon);
-        sb.append(", ").append(lat);
-        sb.append(", ").append(usernameFk);
-        sb.append(", ").append(active);
 
         sb.append(")");
         return sb.toString();

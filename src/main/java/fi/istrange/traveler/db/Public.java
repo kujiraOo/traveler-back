@@ -4,11 +4,15 @@
 package fi.istrange.traveler.db;
 
 
+import fi.istrange.traveler.db.tables.Card;
+import fi.istrange.traveler.db.tables.CardPhoto;
 import fi.istrange.traveler.db.tables.CardUser;
 import fi.istrange.traveler.db.tables.GroupCard;
+import fi.istrange.traveler.db.tables.Match;
 import fi.istrange.traveler.db.tables.PersonalCard;
 import fi.istrange.traveler.db.tables.TravelerUser;
 import fi.istrange.traveler.db.tables.UserCredentials;
+import fi.istrange.traveler.db.tables.UserPhoto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +21,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Catalog;
+import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -34,12 +39,22 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1106405146;
+    private static final long serialVersionUID = -936160445;
 
     /**
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.card</code>.
+     */
+    public final Card CARD = fi.istrange.traveler.db.tables.Card.CARD;
+
+    /**
+     * The table <code>public.card_photo</code>.
+     */
+    public final CardPhoto CARD_PHOTO = fi.istrange.traveler.db.tables.CardPhoto.CARD_PHOTO;
 
     /**
      * The table <code>public.card_user</code>.
@@ -50,6 +65,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.group_card</code>.
      */
     public final GroupCard GROUP_CARD = fi.istrange.traveler.db.tables.GroupCard.GROUP_CARD;
+
+    /**
+     * The table <code>public.match</code>.
+     */
+    public final Match MATCH = fi.istrange.traveler.db.tables.Match.MATCH;
 
     /**
      * The table <code>public.personal_card</code>.
@@ -65,6 +85,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.user_credentials</code>.
      */
     public final UserCredentials USER_CREDENTIALS = fi.istrange.traveler.db.tables.UserCredentials.USER_CREDENTIALS;
+
+    /**
+     * The table <code>public.user_photo</code>.
+     */
+    public final UserPhoto USER_PHOTO = fi.istrange.traveler.db.tables.UserPhoto.USER_PHOTO;
 
     /**
      * No further instances allowed
@@ -83,6 +108,18 @@ public class Public extends SchemaImpl {
     }
 
     @Override
+    public final List<Sequence<?>> getSequences() {
+        List result = new ArrayList();
+        result.addAll(getSequences0());
+        return result;
+    }
+
+    private final List<Sequence<?>> getSequences0() {
+        return Arrays.<Sequence<?>>asList(
+            Sequences.CARD_ID_SEQ);
+    }
+
+    @Override
     public final List<Table<?>> getTables() {
         List result = new ArrayList();
         result.addAll(getTables0());
@@ -91,10 +128,14 @@ public class Public extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Card.CARD,
+            CardPhoto.CARD_PHOTO,
             CardUser.CARD_USER,
             GroupCard.GROUP_CARD,
+            Match.MATCH,
             PersonalCard.PERSONAL_CARD,
             TravelerUser.TRAVELER_USER,
-            UserCredentials.USER_CREDENTIALS);
+            UserCredentials.USER_CREDENTIALS,
+            UserPhoto.USER_PHOTO);
     }
 }
