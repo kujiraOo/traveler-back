@@ -10,7 +10,7 @@ import java.sql.Date;
  */
 public class CardCreationReq {
 
-    private Long id;
+    // private Long id;
     private Date startTime;
     private Date endTime;
     private BigDecimal lon;
@@ -20,7 +20,7 @@ public class CardCreationReq {
 
     @JsonCreator
     public CardCreationReq(
-            @JsonProperty("id") Long id,
+            // @JsonProperty("id") Long id,
             @JsonProperty("title") String title,
             @JsonProperty("description") String description,
             @JsonProperty("startTime") Date startTime,
@@ -28,7 +28,7 @@ public class CardCreationReq {
             @JsonProperty("lon") BigDecimal lon,
             @JsonProperty("lat") BigDecimal lat
     ) {
-        this.id = id;
+        // this.id = id;
         this.title = title;
         this.description = description;
         this.startTime = startTime;
@@ -36,11 +36,11 @@ public class CardCreationReq {
         this.lon = lon;
         this.lat = lat;
     }
-
+/*
     public Long getId() {
         return id;
     }
-
+*/
     public String getTitle() { return title; }
 
     public String getDescription() { return description; }

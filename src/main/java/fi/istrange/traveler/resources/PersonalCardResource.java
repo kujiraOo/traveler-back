@@ -67,6 +67,7 @@ public class PersonalCardResource {
             ) {
         return customPersonalCardDao.fetchByPosition(CardType.PERSONAL, lat, lng, includeArchived, offset, database)
                 .stream()
+                .filter(p -> !p.getOwnerFk().equals(principal.getName()))
                 .map(p -> PersonalCardRes.fromEntity(
                         p,
                         userDAO.fetchOneByUsername(principal.getName()),
@@ -84,14 +85,15 @@ public class PersonalCardResource {
             PersonalCardCreationReq personalCardCreationReq,
             @Context DSLContext database
     ) {
-        this.cardDAO.insert(fromCreateReq(personalCardCreationReq, principal.getName()));
-        this.personalCardDao.insert(new PersonalCard(personalCardCreationReq.getId()));
+        Long cardId = cardDAO.count() + 1;
+        this.cardDAO.insert(fromCreateReq(cardId, personalCardCreationReq, principal.getName()));
+        this.personalCardDao.insert(new PersonalCard(cardId));
 
         return PersonalCardRes.fromEntity(
-                this.cardDAO.fetchOneById(personalCardCreationReq.getId()),
+                this.cardDAO.fetchOneById(cardId),
                 userDAO.fetchOneByUsername(principal.getName()),
                 userPhotoDao.fetchPhotoOidByUsername(principal.getName(), database),
-                cardPhotoDao.fetchPhotoOidByCardId(personalCardCreationReq.getId(), database)
+                cardPhotoDao.fetchPhotoOidByCardId(cardId, database)
         );
     }
 
@@ -115,9 +117,9 @@ public class PersonalCardResource {
                 .findFirst();
     }
 
-    private static Card fromCreateReq(PersonalCardCreationReq req, String username) {
+    private static Card fromCreateReq(Long cardId, PersonalCardCreationReq req, String username) {
         return new Card(
-                req.getId(),
+                cardId,
                 req.getStartTime(),
                 req.getEndTime(),
                 req.getLon(),
