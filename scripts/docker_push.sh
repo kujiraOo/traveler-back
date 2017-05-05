@@ -6,7 +6,7 @@ pip install --user awscli
 export PATH=$PATH:$HOME/.local/bin
 eval $(aws ecr get-login --region $AWS_DEFAULT_REGION)
 
-echo $DOCKER_USERNAME
+echo "\$DOCKER_USERNAME=" $DOCKER_USERNAME
 
 # Login to docker
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
