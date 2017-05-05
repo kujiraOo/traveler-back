@@ -2,13 +2,9 @@
 IMAGE_VERSION="v_"${TRAVIS_BUILD_NUMBER}
 
 if [ "$TRAVIS_BRANCH" == "development" ]; then
-# set this values on team repo
-#    SERVICE_NAME="flask-signup-service"
-#    TASK_FAMILY="flask-signup"
-#    TASK_DEF_TEMPLATE="flask-signup.json"
-    SERVICE_NAME="traveler-back"
+    SERVICE_NAME="flask-signup-service"
     TASK_FAMILY="flask-signup"
-    TASK_DEF_TEMPLATE="traveler-back-task-def.json"
+    TASK_DEF_TEMPLATE="flask-signup.json"
 elif [ "$TRAVIS_BRANCH" == "master" ]; then
     SERVICE_NAME="traveler-back"
     TASK_FAMILY="flask-signup"
